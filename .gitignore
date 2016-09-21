@@ -64,6 +64,7 @@ Thumbs.db
 /third_party/vulkan/
 /third_party/yasm/binaries/
 /third_party/yasm/source/patched-yasm/
+/third_party/vulkan/
 /tools/grit/
 
 # dart packages directories and related.
