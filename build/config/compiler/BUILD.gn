@@ -1151,7 +1151,7 @@ config("symbols") {
     }
     ldflags = [ "/DEBUG" ]
   } else {
-    cflags = [ "-g2" ]
+    cflags = [ "-g3", "-ggdb3" ]
   }
 }
 
