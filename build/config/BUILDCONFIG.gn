@@ -158,6 +158,12 @@ declare_args() {
   # DON'T ADD MORE FLAGS HERE. Read the comment above.
 }
 
+# Some dependencies wish to know whether they're building as part of the Fuchsia
+# source tree, regardless of whether they're currently currently building for
+# Fuchsia target or host. For example, Skia uses this flag to set some defines
+# that stage breaking API changes.
+is_fuchsia_source_tree = true
+
 # =============================================================================
 # OS DEFINITIONS
 # =============================================================================
