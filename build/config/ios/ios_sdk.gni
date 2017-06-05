@@ -14,7 +14,11 @@ declare_args() {
   use_ios_simulator = true
 
   # Version of iOS that we're targeting.
-  ios_deployment_target = "6.0"
+  ios_deployment_target = "8.0"
+
+  # Version of the iOS SDK to use (may be higher than the deployment target if
+  # the code has been written with appropriate version checks).
+  ios_sdk_target = "10.3"
 
   # The iOS Code signing identity to use
   ios_code_signing_identity = ""
@@ -27,14 +31,22 @@ declare_args() {
 }
 
 if (ios_device_sdk_path == "") {
-  _ios_device_sdk_result =
-      exec_script("ios_sdk.py", [ "iphoneos" ], "list lines")
+  _ios_device_sdk_result = exec_script("ios_sdk.py",
+                                       [
+                                         "iphoneos",
+                                         ios_sdk_target,
+                                       ],
+                                       "list lines")
   ios_device_sdk_path = _ios_device_sdk_result[0]
 }
 
 if (ios_simulator_sdk_path == "") {
-  _ios_sim_sdk_result =
-      exec_script("ios_sdk.py", [ "iphonesimulator" ], "list lines")
+  _ios_sim_sdk_result = exec_script("ios_sdk.py",
+                                    [
+                                      "iphonesimulator",
+                                      ios_sdk_target,
+                                    ],
+                                    "list lines")
   ios_simulator_sdk_path = _ios_sim_sdk_result[0]
 }
 
@@ -51,8 +63,7 @@ if (use_ios_simulator) {
 } else {
   # If an identity is not provided, look for one on the host
   if (ios_code_signing_identity == "") {
-    _ios_identities = exec_script("find_signing_identity.py", 
-                                  [], "list lines")
+    _ios_identities = exec_script("find_signing_identity.py", [], "list lines")
     ios_code_signing_identity = _ios_identities[0]
   }
 }
