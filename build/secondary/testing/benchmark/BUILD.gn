@@ -13,9 +13,7 @@
 # limitations under the License.
 
 static_library("benchmark") {
-  if (current_toolchain == host_toolchain) {
-    defines = [ "HAVE_STD_REGEX" ]
-  }
+  defines = [ "HAVE_STD_REGEX" ]
 
   include_dirs = [
     "//third_party/benchmark/include",
