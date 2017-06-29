@@ -19,7 +19,7 @@ import zipfile
 # How to roll the dart sdk: Just change this url! We write this to the stamp
 # file after we download, and then check the stamp file for differences.
 SDK_URL_BASE = ('http://gsdview.appspot.com/dart-archive/channels/stable/raw/'
-                '1.21.0/sdk/')
+                '1.24.2/sdk/')
 
 LINUX_64_SDK = 'dartsdk-linux-x64-release.zip'
 MACOS_64_SDK = 'dartsdk-macos-x64-release.zip'
@@ -35,6 +35,7 @@ def main():
   # Only get the SDK if we don't have a stamp for or have an out of date stamp
   # file.
   get_sdk = False
+  set_unix_file_modes = True
   if sys.platform.startswith('linux'):
     os_infix = 'linux'
     zip_filename = LINUX_64_SDK
@@ -44,6 +45,7 @@ def main():
   elif sys.platform.startswith('win'):
     os_infix = 'win'
     zip_filename = WINDOWS_64_SDK
+    set_unix_file_modes = False
   else:
     print "Platform not supported"
     return 1
@@ -72,8 +74,11 @@ def main():
     with zipfile.ZipFile(output_file, 'r') as zip_ref:
       for zip_info in zip_ref.infolist():
         zip_ref.extract(zip_info, path=dart_sdk_dir)
-        mode = (zip_info.external_attr >> 16) & 0xFFF
-        os.chmod(os.path.join(dart_sdk_dir, zip_info.filename), mode)
+        if set_unix_file_modes:
+            # external_attr is 32 in size with the unix mode in the
+            # high order 16 bit
+            mode = (zip_info.external_attr >> 16) & 0xFFF
+            os.chmod(os.path.join(dart_sdk_dir, zip_info.filename), mode)
 
     # Write our stamp file so we don't redownload the sdk.
     with open(stamp_file, "w") as stamp_file:
