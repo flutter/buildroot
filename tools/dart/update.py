@@ -27,9 +27,27 @@ WINDOWS_64_SDK = 'dartsdk-windows-x64-release.zip'
 
 # Path constants. (All of these should be absolute paths.)
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
-MOJO_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', '..'))
-DART_SDKS_DIR = os.path.join(MOJO_DIR, 'dart/tools/sdks')
-PATCH_FILE = os.path.join(MOJO_DIR, 'tools', 'dart', 'patch_sdk.diff')
+FLUTTER_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', '..'))
+DART_SDKS_DIR = os.path.join(FLUTTER_DIR, 'dart/tools/sdks')
+PATCH_FILE = os.path.join(FLUTTER_DIR, 'tools', 'dart', 'patch_sdk.diff')
+
+def IsStampFileUpToDate(stamp_file, sdk_url):
+  if not os.path.exists(stamp_file):
+    return False
+  # Get the contents of the stamp file.
+  with open(stamp_file, "r") as stamp_file:
+    stamp_url = stamp_file.read().replace('\n', '')
+    return stamp_url == sdk_url
+
+def ExtractZipInto(zip_file, target_extract_dir, set_unix_file_modes):
+  with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+    for zip_info in zip_ref.infolist():
+      zip_ref.extract(zip_info, path=target_extract_dir)
+      if set_unix_file_modes:
+          # external_attr is 32 in size with the unix mode in the
+          # high order 16 bit
+          mode = (zip_info.external_attr >> 16) & 0xFFF
+          os.chmod(os.path.join(target_extract_dir, zip_info.filename), mode)
 
 def main():
   # Only get the SDK if we don't have a stamp for or have an out of date stamp
@@ -51,38 +69,26 @@ def main():
     return 1
 
   sdk_url = SDK_URL_BASE + zip_filename
-  dart_sdk_dir = os.path.join(DART_SDKS_DIR, os_infix)
-  output_file = os.path.join(dart_sdk_dir, zip_filename)
+  dart_base_sdk_dir = os.path.join(DART_SDKS_DIR, os_infix)
+  output_file = os.path.join(dart_base_sdk_dir, zip_filename)
 
-  stamp_file = os.path.join(dart_sdk_dir, 'dart-sdk/STAMP_FILE')
-  if not os.path.exists(stamp_file):
-    get_sdk = True
-  else:
-    # Get the contents of the stamp file.
-    with open(stamp_file, "r") as stamp_file:
-      stamp_url = stamp_file.read().replace('\n', '')
-      if stamp_url != sdk_url:
-        get_sdk = True
+  dart_sdk_dir = os.path.join(dart_base_sdk_dir, 'dart-sdk')
 
-  if get_sdk:
-    # Completely remove all traces of the previous SDK.
-    if os.path.exists(dart_sdk_dir):
-      shutil.rmtree(dart_sdk_dir)
-    os.mkdir(dart_sdk_dir)
+  stamp_file = os.path.join(dart_sdk_dir, 'STAMP_FILE')
+  if IsStampFileUpToDate(stamp_file, sdk_url):
+    return 0
 
-    urllib.urlretrieve(sdk_url, output_file)
-    with zipfile.ZipFile(output_file, 'r') as zip_ref:
-      for zip_info in zip_ref.infolist():
-        zip_ref.extract(zip_info, path=dart_sdk_dir)
-        if set_unix_file_modes:
-            # external_attr is 32 in size with the unix mode in the
-            # high order 16 bit
-            mode = (zip_info.external_attr >> 16) & 0xFFF
-            os.chmod(os.path.join(dart_sdk_dir, zip_info.filename), mode)
+  # Completely remove all traces of the previous SDK.
+  if os.path.exists(dart_sdk_dir):
+    shutil.rmtree(dart_sdk_dir)
+  os.mkdir(dart_sdk_dir)
 
-    # Write our stamp file so we don't redownload the sdk.
-    with open(stamp_file, "w") as stamp_file:
-      stamp_file.write(sdk_url)
+  urllib.urlretrieve(sdk_url, output_file)
+  ExtractZipInto(output_file, dart_base_sdk_dir, set_unix_file_modes)
+
+  # Write our stamp file so we don't redownload the sdk.
+  with open(stamp_file, "w") as stamp_file:
+    stamp_file.write(sdk_url)
 
   return 0
 
