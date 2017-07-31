@@ -30,7 +30,7 @@ static_library("zlib_x86_simd") {
 
 config("zlib_warnings") {
   visibility = [ ":*" ]
-  if (!is_win) {
+  if (is_clang) {
     cflags = [
       "-Wno-incompatible-pointer-types",
       "-Wno-shift-negative-value",
