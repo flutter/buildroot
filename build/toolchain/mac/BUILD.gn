@@ -121,7 +121,7 @@ template("mac_toolchain") {
     }
 
     tool("alink") {
-      command = "$ar rcs {{output}} {{inputs}}"
+      command = "rm -f {{output}} && $ar rcs {{output}} {{inputs}}"
       description = "CREATE ARCHIVE {{output}}"
       outputs = [
         "{{target_out_dir}}/{{target_output_name}}{{output_extension}}",
