@@ -23,23 +23,25 @@ declare_args() {
   ios_simulator_sdk_path = ""
 }
 
-if (ios_device_sdk_path == "") {
-  _ios_device_sdk_result =
-      exec_script("ios_sdk.py", [ "iphoneos" ], "list lines")
-  ios_device_sdk_path = _ios_device_sdk_result[0]
-}
+if (ios_sdk_path == "") {
+  if (!use_ios_simulator && ios_device_sdk_path == "") {
+    _ios_device_sdk_result =
+        exec_script("ios_sdk.py", [ "iphoneos" ], "list lines")
+    ios_device_sdk_path = _ios_device_sdk_result[0]
+  }
 
-if (ios_simulator_sdk_path == "") {
-  _ios_sim_sdk_result =
-      exec_script("ios_sdk.py", [ "iphonesimulator" ], "list lines")
-  ios_simulator_sdk_path = _ios_sim_sdk_result[0]
-}
+  if (use_ios_simulator && ios_simulator_sdk_path == "") {
+    _ios_sim_sdk_result =
+        exec_script("ios_sdk.py", [ "iphonesimulator" ], "list lines")
+    ios_simulator_sdk_path = _ios_sim_sdk_result[0]
+  }
 
-if (ios_sdk_path != "") {
   # Compute default target.
   if (use_ios_simulator) {
+    assert(ios_simulator_sdk_path != "")
     ios_sdk_path = ios_simulator_sdk_path
   } else {
+    assert(ios_device_sdk_path != "")
     ios_sdk_path = ios_device_sdk_path
   }
 }
