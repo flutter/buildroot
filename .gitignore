@@ -57,6 +57,7 @@ Thumbs.db
 /third_party/libjpeg-turbo/
 /third_party/mockito/src/
 /third_party/pdfium/
+/third_party/pkg/
 /third_party/pywebsocket/src/
 /third_party/rapidjson/
 /third_party/requests/src/
