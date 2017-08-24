@@ -49,6 +49,7 @@ Thumbs.db
 /third_party/go/tool/
 /third_party/gtest/
 /third_party/gyp/
+/third_party/harfbuzz/
 /third_party/icu/
 /third_party/jsr-305/src/
 /third_party/junit/src/
