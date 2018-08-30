@@ -300,10 +300,9 @@ config("compiler") {
       }
     }
 
-    defines += [ "_FILE_OFFSET_BITS=64" ]
-
     if (!is_android) {
       defines += [
+        "_FILE_OFFSET_BITS=64", # https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md#32_bit-and
         "_LARGEFILE_SOURCE",
         "_LARGEFILE64_SOURCE",
       ]
