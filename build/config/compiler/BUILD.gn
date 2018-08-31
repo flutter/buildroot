@@ -533,7 +533,7 @@ config("runtime_library") {
           rebase_path("$android_ndk_root/sources/android/support/include",
                       root_build_dir),
       "-isystem" + rebase_path(
-              "$android_ndk_root/sysroot/usr/include/$android_abi_target",
+              "$android_ndk_root/sysroot/usr/include/$android_target_triple",
               root_build_dir),
       "-D__ANDROID_API__=$android_api_level",
     ]
