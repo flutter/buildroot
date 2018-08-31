@@ -515,9 +515,7 @@ config("runtime_library") {
     if (current_cpu != "mipsel" && current_cpu != "mips64el") {
       ldflags += [ "-Wl,--warn-shared-textrel" ]
     }
-    ldflags += [
-      "-nostdlib",
-    ]
+    ldflags += [ "-nostdlib" ]
 
     # NOTE: The libc++ header include paths below are specified in cflags
     # rather than include_dirs because they need to come after include_dirs.
@@ -534,9 +532,9 @@ config("runtime_library") {
       "-isystem" +
           rebase_path("$android_ndk_root/sources/android/support/include",
                       root_build_dir),
-      "-isystem" +
-        rebase_path("$android_ndk_root/sysroot/usr/include/$android_abi_target",
-                    root_build_dir),
+      "-isystem" + rebase_path(
+              "$android_ndk_root/sysroot/usr/include/$android_abi_target",
+              root_build_dir),
       "-D__ANDROID_API__=$android_api_level",
     ]
 
