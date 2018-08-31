@@ -543,8 +543,11 @@ config("runtime_library") {
     libs += [
       "$android_libcpp_library",
       "c++abi",
-      "android_support",
     ]
+
+    if (android_api_level < 21) {
+      libs += [ "android_support" ]
+    }
 
     if (current_cpu == "arm") {
       libs += [ "unwind" ]
