@@ -212,7 +212,10 @@ def main():
   parser.add_argument('dart_sdk_revision', help='Target Dart SDK revision')
   parser.add_argument('--create_commit', action='store_true',
                       help='Create the engine commit with Dart SDK commit log')
-
+  parser.add_argument('--no_test', action='store_true',
+                      help='Skip running tests and hot reload configurations')
+  parser.add_argument('--no_update_licenses', action='store_true',
+                      help='Skip updating licenses')
   args = parser.parse_args()
   updated_revision = args.dart_sdk_revision
 
@@ -223,9 +226,11 @@ def main():
   gclient_sync()
   run_gn()
   build()
-  run_tests()
-  run_hot_reload_configurations()
-  update_licenses()
+  if not args.no_test:
+    run_tests()
+    run_hot_reload_configurations()
+  if not args.no_update_licenses:
+    update_licenses()
   if args.create_commit:
     git_commit()
   print_status('Dart SDK roll complete!')
