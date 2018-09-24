@@ -33,7 +33,7 @@ import sys
 FLUTTER_HOME = os.environ['FLUTTER_HOME']
 ENGINE_HOME = os.environ['ENGINE_HOME']
 DART_SDK_HOME = os.environ['DART_SDK_HOME']
-UPDATE_DART_DEPS = ENGINE_HOME + 'tools/dart/create_updated_flutter_deps.py'
+UPDATE_DART_DEPS = 'tools/dart/create_updated_flutter_deps.py'
 ENGINE_GOLDEN_LICENSES = ENGINE_HOME + 'flutter/ci/licenses_golden/'
 ENGINE_LICENSE_SCRIPT = ENGINE_HOME + 'flutter/ci/licenses.sh'
 FLUTTER_GALLERY = FLUTTER_HOME + 'examples/flutter_gallery'
@@ -67,9 +67,6 @@ def gclient_sync():
   p = subprocess.Popen(['gclient', 'sync'], cwd=ENGINE_HOME)
   p.wait()
 
-def get_updated_deps():
-  return subprocess.check_output([UPDATE_DART_DEPS])
-
 def get_deps():
   with open(ENGINE_HOME + FLUTTER_DEPS_PATH, 'r') as f:
     content = f.readlines()
@@ -77,35 +74,8 @@ def get_deps():
 
 def update_deps():
   print_status('Updating Dart dependencies')
-  content = get_deps()
-  updateddartdeps = get_updated_deps()
-
-  newcontent = []
-  dartrevisionseen = False
-  skipblankline = True
-
-  for idx, line in enumerate(content):
-    if not dartrevisionseen or skipblankline:
-      newcontent.append(line)
-
-      # Find the line with 'dart_revision'
-      if DART_REVISION_ENTRY in line:
-        dartrevisionseen = True
-        newcontent.append('\n')
-        newcontentstr = ''.join(newcontent)
-        newcontentstr += updateddartdeps
-        newcontent = newcontentstr.splitlines(True)
-      elif dartrevisionseen:
-        # Handle the blank line after 'dart_revision'
-        skipblankline = False
-    else:
-      # Skip over the rest of the 'dart_*' deps and copy in the new ones.
-      if not 'dart' in line:
-        newcontent = newcontent + content[idx + 1:]
-        break
-
-  write_deps(newcontent)
-
+  p = subprocess.Popen([UPDATE_DART_DEPS], cwd=ENGINE_HOME)
+  p.wait()
 
 def write_deps(newdeps):
   with open(ENGINE_HOME + FLUTTER_DEPS_PATH, 'w') as f:
@@ -203,7 +173,6 @@ def git_commit():
   commit_cmd = ['git', 'commit', '-a', '-m', commit_msg]
   p = subprocess.Popen(commit_cmd, cwd=ENGINE_FLUTTER)
   p.wait()
-
 
 def main():
   global updated_revision
