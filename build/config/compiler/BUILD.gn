@@ -432,7 +432,7 @@ config("compiler") {
     }
 
     defines += [ "ANDROID" ]
-    
+
     # The NDK has these things, but doesn't define the constants
     # to say that it does. Define them here instead.
     defines += [ "HAVE_SYS_UIO_H" ]
@@ -840,11 +840,9 @@ config("optimize") {
     # build also specifies /Os and /GF but these are implied by /O1.
     cflags = [ "/O1" ] + common_optimize_on_cflags + [ "/Oi" ]
   } else if (is_ios) {
-    # Favor size over speed
-    cflags = [ "-Os" ] + common_optimize_on_cflags 
+    cflags = [ "-Os" ] + common_optimize_on_cflags  # Favor size over speed.
   } else if (is_android) {
-    # Favor size over speed 
-    cflags = [ "-Oz" ] + common_optimize_on_cflags  
+    cflags = [ "-Oz" ] + common_optimize_on_cflags  # Favor size over speed.
     # TODO(goderbauer): re-enable when  https://github.com/flutter/flutter/issues/21686 is fixed
     # if (enable_lto) {
     #   lto_flags += [ "-flto" ]
