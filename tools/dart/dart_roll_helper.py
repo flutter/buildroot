@@ -15,12 +15,8 @@
 #     'flutter/ci/licenses_golden'
 #   - Generating a commit with relevant Dart SDK commit logs (optional)
 #
-<<<<<<< HEAD
-# The following environment variables can be set:
-=======
 # The following environment variables can be set instead of being passed as
 # arguments:
->>>>>>> Addressed comments, updated paths to be platform independent
 #   - FLUTTER_HOME: the absolute path to the 'flutter' directory
 #   - ENGINE_HOME: the absolute path to the 'engine/src' directory
 #   - DART_SDK_HOME: the absolute path to the root of a Dart SDK project
@@ -29,10 +25,7 @@ import argparse
 import datetime
 import fileinput
 import os
-<<<<<<< HEAD
-=======
 import platform
->>>>>>> Addressed comments, updated paths to be platform independent
 import shutil
 import subprocess
 import sys
@@ -43,10 +36,7 @@ def env_var(var):
   except KeyError:
     return ''
 
-<<<<<<< HEAD
-=======
 
->>>>>>> Addressed comments, updated paths to be platform independent
 FLUTTER_HOME = env_var('FLUTTER_HOME')
 ENGINE_HOME = env_var('ENGINE_HOME')
 DART_SDK_HOME = env_var('DART_SDK_HOME')
