@@ -3,8 +3,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Usage: tools/dart/dart_roll_helper.py [--create_commit] dart_sdk_revision
-#
 # This script automates the Dart SDK roll steps, including:
 #   - Updating the Dart revision in DEPS
 #   - Updating the Dart dependencies in DEPS
@@ -17,7 +15,7 @@
 #     'flutter/ci/licenses_golden'
 #   - Generating a commit with relevant Dart SDK commit logs (optional)
 #
-# Requires the following environment variables to be set:
+# The following environment variables can be set:
 #   - FLUTTER_HOME: the absolute path to the 'flutter' directory
 #   - ENGINE_HOME: the absolute path to the 'engine/src' directory
 #   - DART_SDK_HOME: the absolute path to the root of a Dart SDK project
@@ -30,15 +28,47 @@ import shutil
 import subprocess
 import sys
 
-FLUTTER_HOME = os.environ['FLUTTER_HOME']
-ENGINE_HOME = os.environ['ENGINE_HOME']
-DART_SDK_HOME = os.environ['DART_SDK_HOME']
-UPDATE_DART_DEPS = 'tools/dart/create_updated_flutter_deps.py'
-ENGINE_GOLDEN_LICENSES = ENGINE_HOME + 'flutter/ci/licenses_golden/'
-ENGINE_LICENSE_SCRIPT = ENGINE_HOME + 'flutter/ci/licenses.sh'
-FLUTTER_GALLERY = FLUTTER_HOME + 'examples/flutter_gallery'
-PACKAGE_FLUTTER = FLUTTER_HOME + 'packages/flutter'
-FLUTTER_DEPS_PATH = 'flutter/DEPS'
+def env_var(var):
+  try:
+    return os.environ[var]
+  except KeyError:
+    return ''
+
+FLUTTER_HOME = env_var('FLUTTER_HOME')
+ENGINE_HOME = env_var('ENGINE_HOME')
+DART_SDK_HOME = env_var('DART_SDK_HOME')
+
+MAX_GCLIENT_RETRIES = 3
+
+ERROR_GCLIENT_SYNC_FAILED    = 1
+ERROR_BUILD_FAILED           = 2
+ERROR_PKG_FLUTTER_FAILED     = 3
+ERROR_FLUTTER_GALLERY_FAILED = 4
+
+def engine_golden_licenses_path():
+  return os.path.join(ENGINE_HOME, 'flutter/ci/licenses_golden/')
+
+def engine_license_script_path():
+  return os.path.join(ENGINE_HOME, 'flutter/ci/licenses.sh')
+
+def engine_flutter_path():
+  return os.path.join(ENGINE_HOME, 'flutter')
+
+def flutter_deps_path():
+  return os.path.join(ENGINE_HOME, 'flutter/DEPS')
+
+def flutter_gallery_path():
+  return os.path.join(FLUTTER_HOME, 'examples/flutter_gallery')
+
+def license_script_output_path():
+  return os.path.join(ENGINE_HOME, 'out/license_script_output/')
+
+def package_flutter_path():
+  return os.path.join(FLUTTER_HOME, 'packages/flutter')
+
+def update_dart_deps_path():
+  return os.path.join(ENGINE_HOME, 'tools/dart/create_updated_flutter_deps.py')
+
 DART_REVISION_ENTRY = 'dart_revision'
 FLUTTER_RUN = ['flutter', 'run']
 FLUTTER_TEST = ['flutter', 'test']
@@ -50,6 +80,11 @@ def print_status(msg):
   CGREEN = '\033[92m'
   CEND = '\033[0m'
   print(CGREEN + '[STATUS] ' + msg + CEND)
+
+def print_error(msg):
+  CGREEN = '\033[91m'
+  CEND = '\033[0m'
+  print(CGREEN + '[ERROR] ' + msg + CEND)
 
 def update_dart_revision(dart_revision):
   global original_revision
@@ -63,22 +98,32 @@ def update_dart_revision(dart_revision):
   write_deps(content)
 
 def gclient_sync():
-  print_status('Running gclient sync')
-  p = subprocess.Popen(['gclient', 'sync'], cwd=ENGINE_HOME)
-  p.wait()
+  exit_code = None
+  num_retries = 0
+
+  while ((exit_code != 0) and not (num_retries >= MAX_GCLIENT_RETRIES)):
+    print_status('Running gclient sync')
+    p = subprocess.Popen(['gclient', 'sync'], cwd=ENGINE_HOME)
+    exit_code = p.wait()
+    if exit_code != 0:
+      num_retries += 1
+  if num_retries == MAX_GCLIENT_RETRIES:
+    print_error('Max number of gclient sync retries attempted. Aborting roll.')
+    sys.exit(ERROR_GCLIENT_SYNC_FAILED)
+
 
 def get_deps():
-  with open(ENGINE_HOME + FLUTTER_DEPS_PATH, 'r') as f:
+  with open(flutter_deps_path(), 'r') as f:
     content = f.readlines()
   return content
 
 def update_deps():
   print_status('Updating Dart dependencies')
-  p = subprocess.Popen([UPDATE_DART_DEPS], cwd=ENGINE_HOME)
+  p = subprocess.Popen([update_dart_deps_path()], cwd=ENGINE_HOME)
   p.wait()
 
 def write_deps(newdeps):
-  with open(ENGINE_HOME + FLUTTER_DEPS_PATH, 'w') as f:
+  with open(flutter_deps_path(), 'w') as f:
     f.write(''.join(newdeps))
 
 def run_gn():
@@ -118,38 +163,49 @@ def build():
   ]
   for config in configs:
     p = subprocess.Popen(command + ['-C', config], cwd=ENGINE_HOME)
-    p.wait()
+    error_code = p.wait()
+    if error_code != 0:
+      print_error('Build failure for configuration "' +
+                  config +
+                  '". Aborting roll.')
+      sys.exit(ERROR_BUILD_FAILED)
 
 def run_tests():
   print_status('Running tests in packages/flutter')
-  p = subprocess.Popen(FLUTTER_TEST + ['--local-engine=host_debug'],
-                       cwd=PACKAGE_FLUTTER)
-  p.wait()
+  p = subprocess.Popen(FLUTTER_TEST + ['--local-engine=host_debug_unopt'],
+                       cwd=package_flutter_path())
+  result = p.wait()
+  if result != 0:
+    print_error('package/flutter tests failed. Aborting roll.')
+    sys.exit(ERROR_PKG_FLUTTER_FAILED)
+
   print_status('Running tests in examples/flutter_gallery')
-  p = subprocess.Popen(FLUTTER_TEST + ['--local-engine=host_debug'],
-                       cwd=FLUTTER_GALLERY);
+  p = subprocess.Popen(FLUTTER_TEST + ['--local-engine=host_debug_unopt'],
+                       cwd=flutter_gallery_path());
   p.wait()
+  if result != 0:
+    print_error('flutter_gallery tests failed. Aborting roll.')
+    sys.exit(ERROR_FLUTTER_GALLERY_FAILED)
 
 def run_hot_reload_configurations():
   print_status('Running flutter gallery release')
   p = subprocess.Popen(FLUTTER_RUN + ['--release', '--local-engine=android_release'],
-                       cwd=FLUTTER_GALLERY)
+                       cwd=flutter_gallery_path())
   p.wait()
   print_status('Running flutter gallery debug')
   p = subprocess.Popen(FLUTTER_RUN + ['--local-engine=android_debug_unopt'],
-                       cwd=FLUTTER_GALLERY)
+                       cwd=flutter_gallery_path())
   p.wait()
 
 def update_licenses():
   print_status('Updating Flutter licenses')
-  p = subprocess.Popen([ENGINE_LICENSE_SCRIPT], cwd=ENGINE_HOME)
+  p = subprocess.Popen([engine_license_script_path()], cwd=ENGINE_HOME)
   p.wait()
-  LICENSE_SCRIPT_OUTPUT = 'out/license_script_output/'
-  src_files = os.listdir(LICENSE_SCRIPT_OUTPUT)
+  src_files = os.listdir(license_script_output_path())
   for f in src_files:
-    path = os.path.join(LICENSE_SCRIPT_OUTPUT, f)
+    path = os.path.join(license_script_output_path(), f)
     if os.path.isfile(path):
-      shutil.copy(path, ENGINE_GOLDEN_LICENSES)
+      shutil.copy(path, engine_golden_licenses_path())
 
 def get_commit_range(start, finish):
   range_str = '{}...{}'.format(start, finish)
@@ -165,38 +221,70 @@ def git_commit():
   global updated_revision
 
   print_status('Committing Dart SDK roll')
-  ENGINE_FLUTTER = ENGINE_HOME + 'flutter'
   current_date = datetime.date.today()
   sdk_log = get_commit_range(original_revision, updated_revision)
   commit_msg = 'Dart SDK roll for {}\n\n'.format(current_date)
   commit_msg += sdk_log
   commit_cmd = ['git', 'commit', '-a', '-m', commit_msg]
-  p = subprocess.Popen(commit_cmd, cwd=ENGINE_FLUTTER)
+  p = subprocess.Popen(commit_cmd, cwd=engine_flutter_path())
   p.wait()
+
+def update_roots(args):
+  global FLUTTER_HOME
+  global ENGINE_HOME
+  global DART_SDK_HOME
+
+  if args.flutter_home:
+    FLUTTER_HOME = args.flutter_home
+
+  if args.engine_home:
+    ENGINE_HOME = args.engine_home
+
+  if args.dart_sdk_home:
+    DART_SDK_HOME = args.dart_sdk_home
 
 def main():
   global updated_revision
 
   parser = argparse.ArgumentParser(description='Automate most Dart SDK roll tasks.')
+  parser.add_argument('--dart_sdk_home', help='Path to the Dart SDK ' +
+                      'repository. Overrides DART_SDK_HOME environment variable')
   parser.add_argument('dart_sdk_revision', help='Target Dart SDK revision')
   parser.add_argument('--create_commit', action='store_true',
                       help='Create the engine commit with Dart SDK commit log')
+  parser.add_argument('--engine_home', help='Path to the Flutter engine ' +
+                      'repository. Overrides ENGINE_HOME environment variable')
+  parser.add_argument('--flutter_home', help='Path to the Flutter framework ' +
+                      'repository. Overrides FLUTTER_HOME environment variable')
+  parser.add_argument('--no_build', action='store_true',
+                      help='Skip rebuilding the Flutter engine')
+  parser.add_argument('--no_hot_reload', action='store_true',
+                      help="Skip hot reload testing")
   parser.add_argument('--no_test', action='store_true',
-                      help='Skip running tests and hot reload configurations')
+                      help='Skip running host tests for package/flutter and ' +
+                      'flutter_gallery')
+  parser.add_argument('--no_update_deps', action='store_true',
+                      help='Skip updating DEPS file')
   parser.add_argument('--no_update_licenses', action='store_true',
                       help='Skip updating licenses')
+
   args = parser.parse_args()
   updated_revision = args.dart_sdk_revision
 
+  update_roots(args)
+
   print_status('Starting Dart SDK roll')
-  update_dart_revision(updated_revision)
-  gclient_sync()
-  update_deps()
-  gclient_sync()
-  run_gn()
-  build()
+  if not args.no_update_deps:
+    update_dart_revision(updated_revision)
+    gclient_sync()
+    update_deps()
+    gclient_sync()
+  if not args.no_build:
+    run_gn()
+    build()
   if not args.no_test:
     run_tests()
+  if not args.no_hot_reload:
     run_hot_reload_configurations()
   if not args.no_update_licenses:
     update_licenses()
