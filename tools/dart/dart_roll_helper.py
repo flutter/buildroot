@@ -37,8 +37,8 @@ def env_var(var):
     return ''
 
 
-FLUTTER_HOME = env_var('FLUTTER_HOME')
-ENGINE_HOME = env_var('ENGINE_HOME')
+FLUTTER_HOME  = env_var('FLUTTER_HOME')
+ENGINE_HOME   = env_var('ENGINE_HOME')
 DART_SDK_HOME = env_var('DART_SDK_HOME')
 
 MAX_GCLIENT_RETRIES = 3
@@ -48,10 +48,18 @@ ERROR_BUILD_FAILED           = 2
 ERROR_PKG_FLUTTER_FAILED     = 3
 ERROR_FLUTTER_GALLERY_FAILED = 4
 ERROR_MISSING_ROOTS          = 5
+ERROR_LICENSE_SCRIPT_FAILED  = 6
 
 DART_REVISION_ENTRY = 'dart_revision'
-FLUTTER_RUN = ['flutter', 'run']
-FLUTTER_TEST = ['flutter', 'test']
+FLUTTER_RUN  = ['flutter', 'run']
+FLUTTER_TEST = ['flutter', 'test', '--coverage']
+
+# Returned when licenses do not require updating.
+LICENSE_SCRIPT_OKAY       = 0
+# Returned when licenses require updating.
+LICENSE_SCRIPT_UPDATES    = 1
+# Returned when either 'pub' or 'dart' isn't in the path.
+LICENSE_SCRIPT_EXIT_ERROR = 127
 
 def engine_golden_licenses_path():
   return os.path.join(ENGINE_HOME, 'flutter', 'ci', 'licenses_golden')
@@ -233,7 +241,15 @@ def run_hot_reload_configurations():
 def update_licenses():
   print_status('Updating Flutter licenses')
   p = subprocess.Popen([engine_license_script_path()], cwd=ENGINE_HOME)
-  p.wait()
+  result = p.wait()
+  if result == LICENSE_SCRIPT_EXIT_ERROR:
+    print_error('License script failed to run. Is the Dart SDK (specifically' +
+                ' dart and pub) in your path? Aborting roll.')
+    sys.exit(ERROR_LICENSE_SCRIPT_FAILED)
+  elif (result != LICENSE_SCRIPT_OKAY) and (result != LICENSE_SCRIPT_UPDATES):
+    print_error('Unknown license script error: {}. Aborting roll.'
+                .format(result))
+    sys.exit(ERROR_LICENSE_SCRIPT_FAILED)
   src_files = os.listdir(license_script_output_path())
   for f in src_files:
     path = os.path.join(license_script_output_path(), f)
@@ -294,25 +310,25 @@ def update_roots(args):
 
 def main():
   parser = argparse.ArgumentParser(description='Automate most Dart SDK roll tasks.')
-  parser.add_argument('--dart_sdk_home', help='Path to the Dart SDK ' +
+  parser.add_argument('--dart-sdk-home', help='Path to the Dart SDK ' +
                       'repository. Overrides DART_SDK_HOME environment variable')
   parser.add_argument('dart_sdk_revision', help='Target Dart SDK revision')
-  parser.add_argument('--create_commit', action='store_true',
+  parser.add_argument('--create-commit', action='store_true',
                       help='Create the engine commit with Dart SDK commit log')
-  parser.add_argument('--engine_home', help='Path to the Flutter engine ' +
+  parser.add_argument('--engine-home', help='Path to the Flutter engine ' +
                       'repository. Overrides ENGINE_HOME environment variable')
-  parser.add_argument('--flutter_home', help='Path to the Flutter framework ' +
+  parser.add_argument('--flutter-home', help='Path to the Flutter framework ' +
                       'repository. Overrides FLUTTER_HOME environment variable')
-  parser.add_argument('--no_build', action='store_true',
+  parser.add_argument('--no-build', action='store_true',
                       help='Skip rebuilding the Flutter engine')
-  parser.add_argument('--no_hot_reload', action='store_true',
+  parser.add_argument('--no-hot-reload', action='store_true',
                       help="Skip hot reload testing")
-  parser.add_argument('--no_test', action='store_true',
+  parser.add_argument('--no-test', action='store_true',
                       help='Skip running host tests for package/flutter and ' +
                       'flutter_gallery')
-  parser.add_argument('--no_update_deps', action='store_true',
+  parser.add_argument('--no-update-deps', action='store_true',
                       help='Skip updating DEPS file')
-  parser.add_argument('--no_update_licenses', action='store_true',
+  parser.add_argument('--no-update-licenses', action='store_true',
                       help='Skip updating licenses')
 
   args = parser.parse_args()
