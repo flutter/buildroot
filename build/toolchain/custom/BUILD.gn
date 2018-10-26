@@ -16,7 +16,7 @@ toolchain("custom") {
   ld = "${toolchain_bin}/clang++"
   readelf = "${toolchain_bin}/${custom_target_triple}-readelf"
   nm = "${toolchain_bin}/${custom_target_triple}-nm"
-  strip = "${toolchain_bin}/llvm-strip"
+  strip = "${toolchain_bin}/${custom_target_triple}-strip"
 
   target_triple_flags = "--target=${custom_target_triple}"
   sysroot_flags = "--sysroot ${custom_sysroot}"
