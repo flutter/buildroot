@@ -32,6 +32,7 @@ source_set("libcxxabi") {
   defines = [
     "_LIBCXXABI_NO_EXCEPTIONS",
     "_LIBCXXABI_BUILDING_LIBRARY",
+    "LIBCXXABI_SILENT_TERMINATE",
   ]
 
   configs -= [ "//build/config/compiler:no_rtti" ]
