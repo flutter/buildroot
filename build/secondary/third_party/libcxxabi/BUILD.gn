@@ -1,0 +1,43 @@
+# Copyright 2013 The Flutter Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config("libcxxabi_config") {
+  include_dirs = [ "include" ]
+}
+
+source_set("libcxxabi") {
+  visibility = [ "../libcxx" ]
+
+  sources = [
+    "src/abort_message.cpp",
+    "src/cxa_aux_runtime.cpp",
+    "src/cxa_default_handlers.cpp",
+    "src/cxa_exception_storage.cpp",
+    "src/cxa_guard.cpp",
+    "src/cxa_handlers.cpp",
+    "src/cxa_noexception.cpp",
+    "src/cxa_unexpected.cpp",
+    "src/cxa_vector.cpp",
+    "src/cxa_virtual.cpp",
+    "src/fallback_malloc.cpp",
+    "src/private_typeinfo.cpp",
+    "src/stdlib_exception.cpp",
+    "src/stdlib_stdexcept.cpp",
+    "src/stdlib_typeinfo.cpp",
+  ]
+
+  public_configs = [ ":libcxxabi_config" ]
+
+  defines = [
+    "_LIBCXXABI_NO_EXCEPTIONS",
+    "_LIBCXXABI_BUILDING_LIBRARY",
+  ]
+
+  configs -= [ "//build/config/compiler:no_rtti" ]
+
+  configs += [
+    "//build/config/compiler:rtti",
+    "//third_party/libcxx:libcxx_config",
+  ]
+}
