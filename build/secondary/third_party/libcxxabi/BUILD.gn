@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("$flutter_root/common/config.gni")
+
 config("libcxxabi_config") {
   include_dirs = [ "include" ]
 }
@@ -27,6 +29,12 @@ source_set("libcxxabi") {
     "src/stdlib_typeinfo.cpp",
   ]
 
+  if (!is_android || flutter_runtime_mode != "release") {
+    # In release mode third_party/dart/runtime/vm/native_symbol_android.cc
+    # defines __cxa_demangle which conflicts with libcxxabi's definition.
+    sources += [ "src/cxa_demangle.cpp" ]
+  }
+
   public_configs = [ ":libcxxabi_config" ]
 
   defines = [
@@ -36,7 +44,7 @@ source_set("libcxxabi") {
   ]
 
   # ICU uses RTTI, so we need to build libcxxabi with support for it,
-  # https://github.com/flutter/flutter/issues/24535
+  # https://github.com/flutter/flutter/issues/24535.
   configs -= [ "//build/config/compiler:no_rtti" ]
 
   configs += [
