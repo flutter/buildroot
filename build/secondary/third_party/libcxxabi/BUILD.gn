@@ -29,9 +29,10 @@ source_set("libcxxabi") {
     "src/stdlib_typeinfo.cpp",
   ]
 
+  # TODO(goderbauer): Remove this and add cxa_demangle.cpp to the regular source
+  # list above when https://dart-review.googlesource.com/c/sdk/+/84831 has been
+  # rolled into the engine.
   if (!is_android || flutter_runtime_mode != "release") {
-    # In release mode third_party/dart/runtime/vm/native_symbol_android.cc
-    # defines __cxa_demangle which conflicts with libcxxabi's definition.
     sources += [ "src/cxa_demangle.cpp" ]
   }
 
