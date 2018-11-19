@@ -57,6 +57,7 @@ source_set("libcxx") {
   ]
 
   if (is_clang) {
+    # shared_mutex.cpp and debug.cpp are purposefully in violation.
     cflags_cc = [ "-Wno-thread-safety-analysis" ]
   }
 }
