@@ -534,6 +534,7 @@ config("runtime_library") {
       "//third_party/libcxxabi/include",
     ]
 
+    # libunwind and libandroid_support also live in $android_libcpp_root.
     lib_dirs += [ "$android_libcpp_root/libs/$android_app_abi" ]
 
     if (android_api_level < 21) {
