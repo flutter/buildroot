@@ -35,7 +35,8 @@ source_set("libcxxabi") {
     "LIBCXXABI_SILENT_TERMINATE",
   ]
 
-  # ICU uses RTTI, so we need to build libcxxabi with support for it.
+  # ICU uses RTTI, so we need to build libcxxabi with support for it,
+  # https://github.com/flutter/flutter/issues/24535
   configs -= [ "//build/config/compiler:no_rtti" ]
 
   configs += [
