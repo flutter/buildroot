@@ -44,6 +44,12 @@ source_set("libcxx") {
     "//third_party/libcxxabi",
   ]
 
+  # TODO(goderbauer): remove when all sources build with LTO for android_arm64.
+  if (is_android && current_cpu == "arm64") {
+    sources -= [ "src/new.cpp" ]
+    deps += [ ":libcxx_nolto" ]
+  }
+
   public_configs = [
     ":libcxx_config",
     "//third_party/libcxxabi:libcxxabi_config",
@@ -60,4 +66,30 @@ source_set("libcxx") {
     # shared_mutex.cpp and debug.cpp are purposefully in violation.
     cflags_cc = [ "-Wno-thread-safety-analysis" ]
   }
+}
+
+source_set("libcxx_nolto") {
+  visibility = [ ":*" ]
+
+  sources = [
+    "src/new.cpp",
+  ]
+
+  cflags_cc = [ "-fno-lto" ]
+
+  deps = [
+    "//third_party/libcxxabi",
+  ]
+
+  public_configs = [
+    ":libcxx_config",
+    "//third_party/libcxxabi:libcxxabi_config",
+  ]
+
+  defines = [
+    "_LIBCPP_NO_EXCEPTIONS",
+    "_LIBCPP_NO_RTTI",
+    "_LIBCPP_BUILDING_LIBRARY",
+    "LIBCXX_BUILDING_LIBCXXABI",
+  ]
 }

@@ -9,7 +9,7 @@ config("libcxxabi_config") {
 }
 
 source_set("libcxxabi") {
-  visibility = [ "../libcxx" ]
+  visibility = [ "../libcxx:*" ]
 
   sources = [
     "src/abort_message.cpp",
