@@ -13,7 +13,6 @@ from util import md5_check
 
 def DoDex(options, paths):
   d8_binary = os.path.join(options.android_sdk_tools, 'd8')
-  # See http://crbug.com/272064 for context on --force-jumbo.
   dex_cmd = [d8_binary, '--output', options.dex_path]
   dex_cmd += paths
 
