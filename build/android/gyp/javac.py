@@ -93,8 +93,8 @@ def DoJavac(
   if bootclasspath:
     javac_args.extend([
         '-bootclasspath', ':'.join(bootclasspath),
-        '-source', '1.7',
-        '-target', '1.7',
+        '-source', '1.8',
+        '-target', '1.8',
         ])
 
   if chromium_code:
