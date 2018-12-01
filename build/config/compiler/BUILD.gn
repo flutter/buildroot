@@ -316,7 +316,10 @@ config("compiler") {
   }
 
   if (operator_new_alignment != "default" && is_clang) {
-    cflags += [ "-fnew-alignment=$operator_new_alignment" ]
+    cflags += [
+      "-faligned-allocation",
+      "-fnew-alignment=$operator_new_alignment",
+    ]
   }
 
   if (enable_profiling && !is_debug) {
