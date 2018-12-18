@@ -601,7 +601,7 @@ elif [ $? -eq 1 ]; then
     echo "No missing packages, and the packages are up to date."
   else
     echo "Installing missing packages: $new_list."
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install ${do_quietly-} ${new_list}
+    sudo DEBIAN_FRONTEND=noninteractive apt-get ${do_quietly-} install ${new_list}
   fi
   echo
 else
