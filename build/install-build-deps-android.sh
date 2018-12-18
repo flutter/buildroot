@@ -25,34 +25,5 @@ sudo apt-get -y install lib32z1 lighttpd python-pexpect xvfb x11-utils
 sudo apt-get -y install libncurses5:i386 libstdc++6:i386 zlib1g:i386
 # Required for apk-patch-size-estimator
 sudo apt-get -y install bsdiff
-# Do our own error handling for java.
-set +e
-function IsJava8() {
-  # Arg is either "java" or "javac"
-  $1 -version 2>&1 | grep -q '1\.8'
-}
-if ! (IsJava8 java && IsJava8 javac); then
-  sudo apt-get -y install openjdk-8-jre openjdk-8-jdk
-fi
-# There can be several reasons why java8 is not default despite being installed.
-# Just show an error and exit.
-if ! (IsJava8 java && IsJava8 javac); then
-  echo
-  echo "Automatic java installation failed."
-  echo '`java -version` reports:'
-  java -version
-  echo
-  echo '`javac -version` reports:'
-  javac -version
-  echo
-  echo "Please ensure that JDK 8 is installed and resolves first in your PATH."
-  echo -n '`which java` reports: '
-  which java
-  echo -n '`which javac` reports: '
-  which javac
-  echo
-  echo "You might also try running:"
-  echo "    sudo update-java-alternatives -s java-1.8.0-openjdk-amd64"
-  exit 1
-fi
+sudo apt-get -y install openjdk-8-jre openjdk-8-jdk
 echo "install-build-deps-android.sh complete."
