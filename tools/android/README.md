@@ -13,7 +13,13 @@
     - Android Support Library 23.1
     - Google Play services 49
 3. Run upload_android_tools.py -t sdk
+```
   $ tools/android/upload_android_tools.py -t sdk
+```
+
+NOTE: If the gcloud upload fails there, it is possible to simply run
+the command manually.
+
 ----------------------------------------------------------------------
 * How to update Android NDK for Linux/Mac OS X on GCS
 1. Download a new NDK binary (e.g. android-ndk-r10e-linux-x86_64.bin)
