@@ -1,5 +1,7 @@
 # How to update Android SDK for Linux/Mac OS X on GCS
 
+## Android SDK
+
 1. Run Android SDK Manager and update packages
   $ third_party/android_tools/sdk/tools/android update sdk
 2. Choose/Update packages
@@ -21,7 +23,8 @@ NOTE: If the gcloud upload fails there, it is possible to simply run
 the command manually.
 
 ----------------------------------------------------------------------
-* How to update Android NDK for Linux/Mac OS X on GCS
+
+## Android NDK
 1. Download a new NDK binary (e.g. android-ndk-r10e-linux-x86_64.bin)
 2. cd third_party/android_tools
   $ cd third_party/android_tools
