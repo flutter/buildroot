@@ -26,5 +26,6 @@ Future<void> writeChecksums(
   Directory directory,
 ) async {
   final File checksumFile = File(path.join(directory.path, 'checksums.json'));
-  await checksumFile.writeAsString(json.encode(checksums));
+  const JsonEncoder encoder = JsonEncoder.withIndent('  ');
+  await checksumFile.writeAsString(encoder.convert(checksums));
 }
