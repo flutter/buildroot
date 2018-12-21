@@ -1,6 +1,6 @@
 # Android SDK Downloader
 
-This program assits with downloading the Android SDK and NDK artifacts. for
+This program assists with downloading the Android SDK and NDK artifacts. for
 Flutter engine development.
 
 ## Usage
@@ -10,7 +10,7 @@ Flutter engine development.
                                 (defaults to "https://dl.google.com/android/repository/repository2-1.xml")
 
 -p, --platform                  Specifies the Android platform version, e.g. 28
-                                [28 (default), 22]
+                                (defaults to "28")
 
     --platform-revision         Specifies the Android platform revision, e.g. 6 for 28_r06
                                 (defaults to "6")
@@ -19,7 +19,7 @@ Flutter engine development.
                                 (defaults to ".")
 
     --os                        The OS type to download for.  Defaults to current platform.
-                                [windows, macos (default), linux]
+                                (defaults to current platform), accepts: [windows, macos, linux]
 
     --build-tools-version       The build-tools version to download.  Must be in format of <major>.<minor>.<micro>, e.g. 28.0.3; or <major>.<minor>.<micro>.<rc/preview>, e.g. 28.0.0.2
                                 (defaults to "28.0.3")

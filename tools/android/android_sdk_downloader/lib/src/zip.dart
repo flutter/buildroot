@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:io';
 
-// todo: if/when a streaming unzip routine is available for Dart, use that instead.
+// TODO(dnfield): if/when a streaming unzip routine is available for Dart, use that instead.
 
 Future<void> unzipFile(String file, Directory outDir) async {
   await outDir.parent.create(recursive: true);

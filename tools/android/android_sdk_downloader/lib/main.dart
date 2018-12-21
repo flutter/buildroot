@@ -104,8 +104,7 @@ Future<void> main(List<String> args) async {
 
   if (!options.acceptLicenses) {
     for (final AndroidRepositoryLicense license in androidRepository.licenses) {
-      print(
-          '================================================================================\n\n');
+      print('================================================================================\n\n');
       print(license.text);
       stdout.write('Do you accept? (Y/n): ');
       final String result = stdin.readLineSync().trim().toLowerCase();
