@@ -219,8 +219,10 @@ def git_commit(original_revision, updated_revision):
   print_status('Committing Dart SDK roll')
   current_date = datetime.date.today()
   sdk_log = get_commit_range(original_revision, updated_revision)
-  commit_msg = 'Dart SDK roll for {}\n\n'.format(current_date)
-  commit_msg += sdk_log
+  num_commits = len(sdk_log.splitlines())
+  commit_msg = ('Roll src/third_party/dart {}..{} ({} commits)'
+                .format(original_revision, updated_revision, num_commits))
+  commit_msg += '\n' + sdk_log
   commit_cmd = ['git', 'commit', '-a', '-m', commit_msg]
   p = subprocess.Popen(commit_cmd, cwd=engine_flutter_path())
   p.wait()

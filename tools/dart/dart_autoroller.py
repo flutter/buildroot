@@ -61,9 +61,9 @@ FLAG_skip_wait_for_artifacts = False
 
 def run_dart_roll_helper(most_recent_commit, extra_args):
   args = ['python',
-          'dart_roll_helper.py',
-          '--create_commit',
-          '--no_hot_reload',
+          os.path.join(os.path.dirname(__file__), 'dart_roll_helper.py'),
+          '--create-commit',
+          '--no-hot-reload',
           most_recent_commit] + extra_args
   p = subprocess.Popen(args)
   return p.wait()
@@ -159,6 +159,14 @@ def run_dart_roll_helper(most_recent_commit, extra_args):
 #    if result == 0:
 #      break
 #    time.sleep(15)
+#
+#
+# def create_commit(local_repo, branch, message, files):
+#  local_repo.create_head(branch)
+#  local_repo.git.checkout(branch)
+#  index = local_repo.index
+#  index.add(files)
+#  index.commit(message)
 
 
 def clean_and_update_repo(local_repo):
@@ -166,14 +174,6 @@ def clean_and_update_repo(local_repo):
   local_repo.git.clean('-xdf')
   local_repo.git.checkout('master')
   local_repo.git.pull()
-
-
-def create_commit(local_repo, branch, message, files):
-  local_repo.create_head(branch)
-  local_repo.git.checkout(branch)
-  index = local_repo.index
-  index.add(files)
-  index.commit(message)
 
 
 def delete_local_branch(local_repo, branch):
@@ -192,15 +192,17 @@ def delete_remote_branch(github_repo, branch):
 
 def get_most_recent_commit(local_repo):
   commits = list(local_repo.iter_commits())[:1]
-  return commits[0].hexsha
+  return commits[0]
 
 
 def create_pull_request(github_repo, local_repo, title, branch):
   local_repo.create_head(branch)
   local_repo.git.checkout(branch)
   local_repo.git.push('origin', branch)
+  commit = get_most_recent_commit(local_repo)
+  description = PULL_REQUEST_DESCRIPTION + '\n\n' + commit.message
   try:
-    return github_repo.create_pull(title, PULL_REQUEST_DESCRIPTION, 'master', branch)
+    return github_repo.create_pull(title, description, 'master', branch)
   except GithubException as e:
     delete_remote_branch(github_repo, branch)
     raise DartAutorollerException(e.data['errors'][0]['message'])
@@ -339,11 +341,11 @@ def main():
       # Get the most recent commit that is a reasonable candidate.
       most_recent_commit = get_most_recent_green_build(success_threshold=0.9)
     if args.skip_tests:
-      dart_roll_helper_args.append('--no_test')
+      dart_roll_helper_args.append('--no-test')
     if args.skip_build:
-      dart_roll_helper_args.append('--no_build')
+      dart_roll_helper_args.append('--no-build')
     if args.skip_update_licenses:
-      dart_roll_helper_args.append('--no_update_licenses')
+      dart_roll_helper_args.append('--no-update-licenses')
 
 
     # Will exit with code ERROR_OLD_COMMIT_PROVIDED if `most_recent_commit` is
