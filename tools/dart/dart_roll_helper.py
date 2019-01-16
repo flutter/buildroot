@@ -198,7 +198,8 @@ def update_licenses():
     print_error('Unknown license script error: {}. Aborting roll.'
                 .format(result))
     sys.exit(ERROR_LICENSE_SCRIPT_FAILED)
-  src_files = os.listdir(license_script_output_path())
+  # Ignore 'licenses_skia' as they shouldn't change during a Dart SDK roll.
+  src_files = ['licenses_flutter', 'licenses_third_party', 'tool_signature']
   for f in src_files:
     path = os.path.join(license_script_output_path(), f)
     if os.path.isfile(path):
@@ -215,13 +216,23 @@ def get_commit_range(start, finish):
   return result
 
 
+def get_short_rev(rev):
+  command = ['git', 'rev-parse', '--short', rev]
+  orig_dir = os.getcwd()
+  os.chdir(DART_SDK_HOME)
+  result = subprocess.check_output(command)
+  os.chdir(orig_dir)
+  return result.rstrip()
+
+
 def git_commit(original_revision, updated_revision):
   print_status('Committing Dart SDK roll')
   current_date = datetime.date.today()
   sdk_log = get_commit_range(original_revision, updated_revision)
   num_commits = len(sdk_log.splitlines())
   commit_msg = ('Roll src/third_party/dart {}..{} ({} commits)'
-                .format(original_revision, updated_revision, num_commits))
+                .format(get_short_rev(original_revision),
+                        get_short_rev(updated_revision), num_commits))
   commit_msg += '\n' + sdk_log
   commit_cmd = ['git', 'commit', '-a', '-m', commit_msg]
   p = subprocess.Popen(commit_cmd, cwd=engine_flutter_path())
@@ -244,17 +255,17 @@ def update_roots(args):
     DART_SDK_HOME = args.dart_sdk_home
 
   if FLUTTER_HOME == '':
-    print_error('Either "--flutter_home" must be provided or FLUTTER_HOME must' +
+    print_error('Either "--flutter-home" must be provided or FLUTTER_HOME must' +
                 ' be set. Aborting roll.')
     sys.exit(ERROR_MISSING_ROOTS)
 
   if ENGINE_HOME == '':
-    print_error('Either "--engine_home" must be provided or ENGINE_HOME must' +
+    print_error('Either "--engine-home" must be provided or ENGINE_HOME must' +
                 ' be set. Aborting roll.')
     sys.exit(ERROR_MISSING_ROOTS)
 
   if DART_SDK_HOME == '':
-    print_error('Either "--dart_sdk_home" must be provided or DART_SDK_HOME ' +
+    print_error('Either "--dart-sdk-home" must be provided or DART_SDK_HOME ' +
                 'must be set. Aborting roll.')
     sys.exit(ERROR_MISSING_ROOTS)
 

@@ -38,6 +38,18 @@ class BuildStatus:
     return self._parameters['properties']['revision']
 
 
+  # Checks to ensure that a valid status was returned. Invalid statuses can be
+  # returned when the build infrastructure is broken.
+  def is_valid_status(self):
+    try:
+      self.builder_name
+      self.build_number
+      self.revision
+      return True
+    except KeyError:
+      return False
+
+
   def is_completed(self):
     return self._state['status'] == 'COMPLETED'
 
@@ -144,12 +156,20 @@ def get_most_recent_green_build(success_threshold=0.95):
 
   for commit in sorted_commits:
     commit_states = states_by_commit[commit]
+
+    # Ignore revisions that returned bad state. This could be due to the bots
+    # being purple or some other infrastructure issues.
+    valid_states = bool(reduce(lambda x, prev: x.is_valid_status() and prev, commit_states))
+    if not valid_states:
+      continue
+
     in_progress = sum(map((lambda state: int(not state.is_completed())), commit_states))
     if in_progress > 0:
       continue
+
     # Only consider builds where the Dart-Engine-Flutter bots are green.
     flutter_builder_states = list(filter(lambda x: ('flutter' in x.builder_name), commit_states))
-    flutter_builder_success = bool(reduce(lambda x: x.is_success(), flutter_builder_states))
+    flutter_builder_success = bool(reduce(lambda x, prev: (x.is_success() and prev), flutter_builder_states))
     if not flutter_builder_success:
       continue
     successes = map((lambda state: int(state.is_success())), commit_states)

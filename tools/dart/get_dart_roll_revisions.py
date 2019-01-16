@@ -18,7 +18,7 @@ import argparse
 import os
 
 DART_REVISION_PATCH_STR = "+  'dart_revision'"
-DART_SDK_ROLL = 'Dart SDK roll'
+DART_SDK_ROLL = 'Roll src/third_party/dart'
 GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
 
 # Control codes for coloured terminal output.

@@ -195,6 +195,11 @@ def get_most_recent_commit(local_repo):
   return commits[0]
 
 
+def get_pr_title(local_repo):
+  commit = get_most_recent_commit(local_repo)
+  return commit.message.splitlines()[0].rstrip()
+
+
 def create_pull_request(github_repo, local_repo, title, branch):
   local_repo.create_head(branch)
   local_repo.git.checkout(branch)
@@ -209,9 +214,11 @@ def create_pull_request(github_repo, local_repo, title, branch):
   finally:
     print_status('Cleaning up local branch: {}'.format(branch))
     delete_local_branch(local_repo, branch)
+    # Remove the commit from the local master branch.
+    local_repo.git.reset('--hard','origin/master')
 
 
-def merge_on_success(github_repo, pull_request):
+def merge_on_success(github_repo, local_repo, pull_request):
   sha = pull_request.head.sha
   commit = github_repo.get_commit(sha=sha)
 
@@ -230,6 +237,7 @@ def merge_on_success(github_repo, pull_request):
     pull_request.edit(state='closed')
     print_error('Checks failed. Abandoning roll.')
   delete_remote_branch(github_repo, pull_request.head.ref)
+
 
 # TODO(bkonyi): Check to see if the Flutter build is green for flutter/flutter
 # if we decide to roll the engine into the framework.
@@ -282,6 +290,9 @@ def main():
   global FLAG_skip_wait_for_artifacts
 
   parser = argparse.ArgumentParser(description='Dart SDK autoroller for Flutter.')
+  parser.add_argument('--dart-sdk-revision',
+                      help='Provide a Dart SDK revision to roll instead of '
+                        'choosing one automatically')
   parser.add_argument('--no-update-repos',
                       help='Skip cleaning and updating local repositories',
                       action='store_true')
@@ -336,7 +347,9 @@ def main():
     most_recent_commit = ''
     dart_roll_helper_args = []
     if args.skip_update_deps:
-      dart_roll_helper_args.append('--no_update_deps')
+      dart_roll_helper_args.append('--no-update-deps')
+    elif args.dart_sdk_revision != None:
+      most_recent_commit = args.dart_sdk_revision
     else:
       # Get the most recent commit that is a reasonable candidate.
       most_recent_commit = get_most_recent_green_build(success_threshold=0.9)
@@ -363,7 +376,7 @@ def main():
   try:
     pr = create_pull_request(github_engine_repo,
                         local_engine_flutter_repo,
-                        'Dart SDK roll for {}'.format(current_date),
+                        get_pr_title(local_engine_flutter_repo),
                         'dart-sdk-roll-{}'.format(current_date))
   except DartAutorollerException as e:
     print_error(('Error while creating flutter/engine pull request: {}.'
@@ -372,7 +385,7 @@ def main():
 
   if not FLAG_skip_wait_for_artifacts:
     print_status('Waiting for PR checks to complete...')
-    merge_on_success(github_engine_repo, pr)
+    merge_on_success(github_engine_repo, local_engine_flutter_repo, pr)
     print_status('PR checks complete!')
   else:
     print_warning('Skipping wait for PR checks!')
