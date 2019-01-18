@@ -7,9 +7,8 @@ import 'package:xml/xml.dart';
 
 // see https://android.googlesource.com/platform/tools/base/+/master/sdklib/src/main/java/com/android/sdklib/repository/sdk-repository-10.xsd
 
-const String _xsi = 'http://www.w3.org/2001/XMLSchema-instance';
-const String _sdk =
-    'http://schemas.android.com/sdk/android/repo/repository2/01';
+const String _kXsi = 'http://www.w3.org/2001/XMLSchema-instance';
+const String _kSdk = 'http://schemas.android.com/sdk/android/repo/repository2/01';
 
 void _debugCheckElement(
   XmlElement element,
@@ -57,6 +56,8 @@ OSType _parseHostType(String value) {
   }
 }
 
+/// Parses a the Android SDK's https://dl.google.com/android/repository/repository2-1.xml
+/// into an [AndroidRepository] object.
 AndroidRepository parseAndroidRepositoryXml(String rawXml) {
   final XmlDocument doc = xml.parse(rawXml);
   return AndroidRepository.fromXml(doc.rootElement);
@@ -72,7 +73,7 @@ XmlElement _getTypeDetails(XmlElement parent) {
 }
 
 String _getTypeDetailsType(XmlElement typeDetails) {
-  return typeDetails.getAttribute('type', namespace: _xsi);
+  return typeDetails.getAttribute('type', namespace: _kXsi);
 }
 
 Iterable<XmlElement> _getArchives(XmlElement parent) {
@@ -85,6 +86,7 @@ Iterable<XmlElement> _getArchives(XmlElement parent) {
   return archives.findElements('archive');
 }
 
+/// Object class for https://dl.google.com/android/repository/repository2-1.xml.
 class AndroidRepository {
   const AndroidRepository(
     this.licenses,
@@ -93,16 +95,16 @@ class AndroidRepository {
     this.platformTools,
     this.tools,
     this.ndkBundles,
-  )   : assert(licenses != null),
-        assert(platforms != null),
-        assert(buildTools != null),
-        assert(platformTools != null),
-        assert(tools != null),
-        assert(ndkBundles != null);
+  ) : assert(licenses != null),
+      assert(platforms != null),
+      assert(buildTools != null),
+      assert(platformTools != null),
+      assert(tools != null),
+      assert(ndkBundles != null);
 
   /// Parses the `<sdk-repository>` element.
   factory AndroidRepository.fromXml(XmlElement element) {
-    _debugCheckElement(element, 'sdk-repository', namespace: _sdk);
+    _debugCheckElement(element, 'sdk-repository', namespace: _kSdk);
     final List<AndroidRepositoryLicense> licenses =
         <AndroidRepositoryLicense>[];
     final List<AndroidRepositoryPlatform> platforms =
@@ -179,6 +181,9 @@ class AndroidRepository {
   final List<AndroidRepositoryRemotePackage> ndkBundles;
 }
 
+/// Object class for the `<license>` element in the Android repo XML.
+///
+/// This node contains license information for the packages in the SDK.
 class AndroidRepositoryLicense {
   /// Creates a new RepositoryLicense holder.
   const AndroidRepositoryLicense(this.id, this.text)
@@ -198,16 +203,20 @@ class AndroidRepositoryLicense {
   final String text;
 }
 
+/// Object class for the `<remotePackage>` nodes in the repo XML.
+///
+/// These nodes contain information about where to download the zipped
+/// binaries for various components of the SDK.
 class AndroidRepositoryRemotePackage {
   const AndroidRepositoryRemotePackage(
     this.revision,
     this.displayName,
     this.archives, {
     this.isObsolete = false,
-  })  : assert(revision != null),
-        assert(displayName != null),
-        assert(archives != null),
-        assert(isObsolete != null);
+  }) : assert(revision != null),
+       assert(displayName != null),
+       assert(archives != null),
+       assert(isObsolete != null);
 
   factory AndroidRepositoryRemotePackage.fromXml(XmlElement element) {
     _debugCheckElement(element, 'remotePackage');
@@ -238,10 +247,11 @@ class AndroidRepositoryRemotePackage {
   final bool isObsolete;
 
   @override
-  String toString() =>
-      '$runtimeType{revision: $revision, displayName: $displayName, archives: $archives}';
+  String toString() => '$runtimeType{revision: $revision, displayName: $displayName, archives: $archives}';
 }
 
+/// Object class for instances of `<remotePackage>` elements that are for the
+/// platform package.
 class AndroidRepositoryPlatform extends AndroidRepositoryRemotePackage {
   const AndroidRepositoryPlatform(
     AndroidRepositoryRevision revision,
@@ -249,8 +259,8 @@ class AndroidRepositoryPlatform extends AndroidRepositoryRemotePackage {
     List<AndroidRepositoryArchive> archives,
     this.apiLevel, {
     bool isObsolete = false,
-  })  : assert(apiLevel != null),
-        super(revision, displayName, archives, isObsolete: isObsolete);
+  }) : assert(apiLevel != null),
+       super(revision, displayName, archives, isObsolete: isObsolete);
 
   /// Parses an platform from a `<remotePackage>` element.
   factory AndroidRepositoryPlatform.fromXml(
@@ -278,8 +288,7 @@ class AndroidRepositoryPlatform extends AndroidRepositoryRemotePackage {
   final int apiLevel;
 
   @override
-  String toString() =>
-      '$runtimeType{revision: $revision, displayName: $displayName, archives: $archives, apiLevel: $apiLevel}';
+  String toString() => '$runtimeType{revision: $revision, displayName: $displayName, archives: $archives, apiLevel: $apiLevel}';
 }
 
 /// The OS types supported by Android.
@@ -297,6 +306,11 @@ enum OSType {
   windows,
 }
 
+/// Object class for the `<archive>` element in the Android repo XML.
+///
+/// Contains information about the size, checksum, and location of a binary
+/// zip archive. Optionally contains information about what host OS is
+/// supported.
 class AndroidRepositoryArchive {
   /// Creates a new AndroidRepositoryArchive.
   const AndroidRepositoryArchive(
@@ -304,10 +318,10 @@ class AndroidRepositoryArchive {
     this.checksum,
     this.url, {
     this.hostOS = OSType.any,
-  })  : assert(size != null),
-        assert(checksum != null),
-        assert(url != null),
-        assert(hostOS != null);
+  }) : assert(size != null),
+       assert(checksum != null),
+       assert(url != null),
+       assert(hostOS != null);
 
   /// Parses an `<archive>` element.
   factory AndroidRepositoryArchive.fromXml(XmlElement element) {
@@ -339,10 +353,16 @@ class AndroidRepositoryArchive {
   final OSType hostOS;
 
   @override
-  String toString() =>
-      '$runtimeType{size: $size, checksum: $checksum, url: $url, hostOS: $hostOS}';
+  String toString() => '$runtimeType{size: $size, checksum: $checksum, url: $url, hostOS: $hostOS}';
 }
 
+/// Object class for a `<revision>` node in the Android repo XML.
+///
+/// Contains information about the revision of the archive.
+///
+/// In the case of the platform package, this is the revision of the platform.
+///
+/// In all other cases, this basically works like semver.
 class AndroidRepositoryRevision {
   /// Creates a new Android repository revision object. All values are required.
   const AndroidRepositoryRevision(
@@ -350,10 +370,10 @@ class AndroidRepositoryRevision {
     this.minor = 0,
     this.micro = 0,
     this.preview = 0,
-  ])  : assert(major != null),
-        assert(minor != null),
-        assert(micro != null),
-        assert(preview != null);
+  ]) : assert(major != null),
+       assert(minor != null),
+       assert(micro != null),
+       assert(preview != null);
 
   /// Parses a `<revision>` element from the Android repository XML.
   factory AndroidRepositoryRevision.fromXml(XmlElement element) {

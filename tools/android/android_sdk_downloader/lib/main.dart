@@ -14,8 +14,7 @@ import 'src/http.dart';
 import 'src/options.dart';
 import 'src/zip.dart';
 
-const String _androidRepositoryXml =
-    'https://dl.google.com/android/repository/repository2-1.xml';
+const String _kAndroidRepositoryXml = 'https://dl.google.com/android/repository/repository2-1.xml';
 
 
 Future<void> main(List<String> args) async {
@@ -24,18 +23,16 @@ Future<void> main(List<String> args) async {
       'repository-xml',
       abbr: 'r',
       help: 'Specifies the location of the Android Repository XML file.',
-      defaultsTo: _androidRepositoryXml,
+      defaultsTo: _kAndroidRepositoryXml,
     )
     ..addOption(
       'platform',
       abbr: 'p',
       help: 'Specifies the Android platform version, e.g. 28',
-      defaultsTo: '28',
     )
     ..addOption(
       'platform-revision',
       help: 'Specifies the Android platform revision, e.g. 6 for 28_r06',
-      defaultsTo: '6',
     )
     ..addOption(
       'out',
@@ -54,28 +51,24 @@ Future<void> main(List<String> args) async {
       help: 'The build-tools version to download.  Must be in format of '
           '<major>.<minor>.<micro>, e.g. 28.0.3; '
           'or <major>.<minor>.<micro>.<rc/preview>, e.g. 28.0.0.2',
-      defaultsTo: '28.0.3',
     )
     ..addOption(
       'platform-tools-version',
       help: 'The platform-tools version to download.  Must be in format of '
           '<major>.<minor>.<micro>, e.g. 28.0.1; '
           'or <major>.<minor>.<micro>.<rc/preview>, e.g. 28.0.0.2',
-      defaultsTo: '28.0.1',
     )
     ..addOption(
       'tools-version',
       help: 'The tools version to download.  Must be in format of '
           '<major>.<minor>.<micro>, e.g. 26.1.1; '
           'or <major>.<minor>.<micro>.<rc/preview>, e.g. 28.1.1.2',
-      defaultsTo: '26.1.1',
     )
     ..addOption(
       'ndk-version',
       help: 'The ndk version to download.  Must be in format of '
           '<major>.<minor>.<micro>, e.g. 28.0.3; '
           'or <major>.<minor>.<micro>.<rc/preview>, e.g. 28.0.0.2',
-      defaultsTo: '18.1.5063045',
     )
     ..addFlag('accept-licenses',
         abbr: 'y',
@@ -87,9 +80,9 @@ Future<void> main(List<String> args) async {
       help: 'Skip download if the target directory exists.',
     );
 
-  final bool help = args.contains('-h') ||
-      args.contains('--help') ||
-      (args.isNotEmpty && args.first == 'help');
+  final bool help = args.contains('-h')
+                 || args.contains('--help')
+                 || (args.isNotEmpty && args.first == 'help');
   if (help) {
     print(argParser.usage);
     return;
@@ -97,8 +90,7 @@ Future<void> main(List<String> args) async {
 
   final Options options = Options.parseAndValidate(args, argParser);
 
-  final AndroidRepository androidRepository =
-      await _getAndroidRepository(options.repositoryXmlUri);
+  final AndroidRepository androidRepository = await _getAndroidRepository(options.repositoryXmlUri);
   assert(androidRepository.platforms.isNotEmpty);
   assert(androidRepository.buildTools.isNotEmpty);
 
@@ -117,20 +109,14 @@ Future<void> main(List<String> args) async {
 
   await options.outDirectory.create(recursive: true);
 
-  final Directory tempDir =
-      await Directory(options.outDirectory.path).createTemp();
+  final Directory tempDir = await Directory(options.outDirectory.path).createTemp();
   await tempDir.create(recursive: true);
 
-  final Directory ndkDir =
-      Directory(path.join(options.outDirectory.path, 'ndk'));
-  final Directory sdkDir =
-      Directory(path.join(options.outDirectory.path, 'sdk'));
-  final Directory platformDir = Directory(path.join(
-      sdkDir.path, 'platforms', 'android-${options.platformApiLevel}'));
-  final Directory buildToolsDir = Directory(
-      path.join(sdkDir.path, 'build-tools', options.buildToolsRevision.raw));
-  final Directory platformToolsDir =
-      Directory(path.join(sdkDir.path, 'platform-tools'));
+  final Directory ndkDir = Directory(path.join(options.outDirectory.path, 'ndk'));
+  final Directory sdkDir = Directory(path.join(options.outDirectory.path, 'sdk'));
+  final Directory platformDir = Directory(path.join(sdkDir.path, 'platforms', 'android-${options.platformApiLevel}'));
+  final Directory buildToolsDir = Directory(path.join(sdkDir.path, 'build-tools', options.buildToolsRevision.raw));
+  final Directory platformToolsDir = Directory(path.join(sdkDir.path, 'platform-tools'));
   final Directory toolsDir = Directory(path.join(sdkDir.path, 'tools'));
 
   final Map<String, String> checksums =
@@ -152,6 +138,7 @@ Future<void> main(List<String> args) async {
         return writeChecksums(checksums, options.outDirectory);
       });
     }
+    return null;
   }));
   futures.add(downloadArchive(
     androidRepository.buildTools,
@@ -160,13 +147,14 @@ Future<void> main(List<String> args) async {
     tempDir,
     osType: options.osType,
     checksumToSkip: options.overwrite ? null : checksums[buildToolsDir.path],
-  ).then((ArchiveDownloadResult result) async {
+  ).then((ArchiveDownloadResult result) {
     if (result != ArchiveDownloadResult.empty) {
       return unzipFile(result.zipFileName, buildToolsDir).then((_) {
         checksums[buildToolsDir.path] = result.checksum;
         return writeChecksums(checksums, options.outDirectory);
       });
     }
+    return null;
   }));
   futures.add(downloadArchive(
     androidRepository.platformTools,
@@ -175,13 +163,14 @@ Future<void> main(List<String> args) async {
     tempDir,
     osType: options.osType,
     checksumToSkip: options.overwrite ? null : checksums[platformToolsDir.path],
-  ).then((ArchiveDownloadResult result) async {
+  ).then((ArchiveDownloadResult result) {
     if (result != ArchiveDownloadResult.empty) {
       return unzipFile(result.zipFileName, platformToolsDir).then((_) {
         checksums[platformToolsDir.path] = result.checksum;
         return writeChecksums(checksums, options.outDirectory);
       });
     }
+    return null;
   }));
   futures.add(downloadArchive(
     androidRepository.tools,
@@ -190,13 +179,14 @@ Future<void> main(List<String> args) async {
     tempDir,
     osType: options.osType,
     checksumToSkip: options.overwrite ? null : checksums[toolsDir.path],
-  ).then((ArchiveDownloadResult result) async {
+  ).then((ArchiveDownloadResult result) {
     if (result != ArchiveDownloadResult.empty) {
       return unzipFile(result.zipFileName, toolsDir).then((_) {
         checksums[toolsDir.path] = result.checksum;
         return writeChecksums(checksums, options.outDirectory);
       });
     }
+    return null;
   }));
   futures.add(downloadArchive(
     androidRepository.ndkBundles,
@@ -205,13 +195,14 @@ Future<void> main(List<String> args) async {
     tempDir,
     osType: options.osType,
     checksumToSkip: options.overwrite ? null : checksums[ndkDir.path],
-  ).then((ArchiveDownloadResult result) async {
+  ).then((ArchiveDownloadResult result) {
     if (result != ArchiveDownloadResult.empty) {
       return unzipFile(result.zipFileName, ndkDir).then((_) {
         checksums[ndkDir.path] = result.checksum;
         return writeChecksums(checksums, options.outDirectory);
       });
     }
+    return null;
   }));
   await Future.wait<void>(futures);
   await tempDir.delete(recursive: true);

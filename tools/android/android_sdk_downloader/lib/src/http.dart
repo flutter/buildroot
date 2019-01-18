@@ -36,8 +36,7 @@ class DownloadTracker {
   final int total;
   int received;
 
-  String get percent =>
-      '${((received / total) * 100).round().toString().padLeft(3)}%';
+  String get percent => '${((received / total) * 100).round()}'.padLeft(3) + '%';
 
   @override
   String toString() => '$name: $received/$total ($percent).';

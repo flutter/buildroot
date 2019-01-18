@@ -24,6 +24,7 @@ class OptionsRevision {
     this.preview = 0,
   ]);
 
+  /// Accepted formats: 1.2.3 or 1.2.3.4
   factory OptionsRevision.fromRaw(String raw) {
     final List<String> rawParts = raw.split('.');
     if (rawParts == null || (rawParts.length != 3 && rawParts.length != 4)) {
