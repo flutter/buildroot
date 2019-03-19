@@ -34,6 +34,7 @@ config("zlib_warnings") {
     cflags = [
       "-Wno-incompatible-pointer-types",
       "-Wno-shift-negative-value",
+      "-Wno-shift-negative-value",
     ]
   }
 }
