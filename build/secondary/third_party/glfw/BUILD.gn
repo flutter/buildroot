@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-_checkout_dir = "src"
+_checkout_dir = "//third_party/glfw"
 
 config("relative_glfw_headers") {
   include_dirs = [ "$_checkout_dir/include" ]
