@@ -1,6 +1,5 @@
 Name: GLFW
 License: zlib/libpng (BSD-like)
-License File: LICENSE
 Upstream Git: https://github.com/glfw/glfw
 Version: 3.2.1
 Description:
