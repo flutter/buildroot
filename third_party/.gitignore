@@ -10,6 +10,8 @@
 *
 !.gitignore
 !expat/
+!glfw/
+!glfw/*
 !libpng/
 !libxml/
 !zlib/
