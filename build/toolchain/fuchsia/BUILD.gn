@@ -15,9 +15,9 @@ toolchain("fuchsia") {
   cxx = "${toolchain_bin}/clang++"
   ar = "${toolchain_bin}/${custom_target_triple}-ar"
   ld = "${toolchain_bin}/clang++"
-  readelf = "${toolchain_bin}/${custom_target_triple}-readelf"
-  nm = "${toolchain_bin}/${custom_target_triple}-nm"
-  strip = "${toolchain_bin}/${custom_target_triple}-strip"
+  readelf = "${toolchain_bin}/llvm-readelf"
+  nm = "${toolchain_bin}/llvm-nm"
+  strip = "${toolchain_bin}/llvm-strip"
 
   target_triple_flags = "--target=x86_64-fuchsia"
   sysroot_flags = "--sysroot ${fuchsia_sdk}/arch/x64/sysroot"
