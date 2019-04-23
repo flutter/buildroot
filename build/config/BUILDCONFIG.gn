@@ -632,6 +632,11 @@ if (custom_toolchain != "") {
 }
 
 if (is_fuchsia_sdk) {
+  if (host_os == "mac") {
+    host_toolchain = "//build/toolchain/mac:clang_$host_cpu"
+  } else {
+    host_toolchain = "//build/toolchain/linux:clang_$host_cpu"
+  }
   set_default_toolchain("//build/toolchain/fuchsia")
 }
 
