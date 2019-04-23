@@ -5,8 +5,8 @@
 import("//build/toolchain/fuchsia/fuchsia.gni")
 
 toolchain("fuchsia") {
-  toolchain_bin = "/Users/chinmaygarde/Desktop/fuchsiasdk/toolchain/bin"
-  fuchsia_sdk = "/Users/chinmaygarde/Desktop/fuchsiasdk/sdk"
+  toolchain_bin = rebase_path("//fuchsia/toolchain/bin", root_out_dir)
+  fuchsia_sdk = rebase_path("//fuchsia/sdk", root_out_dir)
 
   # We can't do string interpolation ($ in strings) on things with dots in
   # them. To allow us to use $cc below, for example, we create copies of
