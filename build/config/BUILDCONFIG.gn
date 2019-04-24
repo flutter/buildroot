@@ -266,7 +266,7 @@ if (current_os == "win") {
   is_fuchsia = true
   is_fuchsia_host = false
   is_ios = false
-  is_linux = true
+  is_linux = false
   is_mac = false
   is_posix = true
   is_win = false

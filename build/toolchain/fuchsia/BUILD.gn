@@ -13,7 +13,7 @@ toolchain("fuchsia") {
   # these values in our scope.
   cc = "${toolchain_bin}/clang"
   cxx = "${toolchain_bin}/clang++"
-  ar = "${toolchain_bin}/${custom_target_triple}-ar"
+  ar = "${toolchain_bin}/llvm-ar"
   ld = "${toolchain_bin}/clang++"
   readelf = "${toolchain_bin}/llvm-readelf"
   nm = "${toolchain_bin}/llvm-nm"
@@ -22,39 +22,9 @@ toolchain("fuchsia") {
   target_triple_flags = "--target=x86_64-fuchsia"
   sysroot_flags = "--sysroot ${fuchsia_sdk}/arch/x64/sysroot"
 
-  custom_lib_flags = "-L${fuchsia_sdk}/arch/x64/lib"
-
   # These library switches can apply to all tools below.
   lib_switch = "-l"
   lib_dir_switch = "-L"
-
-  packages = [
-    # "zx",
-    # "fidl_cpp",
-    # "syslog",
-    # "memfs",
-    # "fit",
-    # "fidl_base",
-    # "fidl_cpp_sync",
-    # "async-default",
-    # "async",
-    # "fidl-async",
-    # "fidl_cpp_base",
-    # "fdio",
-    # "scenic_cpp",
-    # "svc",
-    # "async-loop",
-    # "async-loop-cpp",
-    # "fidl",
-    # "sync",
-    # "images_cpp",
-  ]
-
-  foreach(package, packages) {
-    package_include =
-        rebase_path("//fuchsia/gen/fidl/fuchsia.${package}", root_out_dir)
-    sysroot_flags = " $sysroot_flags -I${package_include} "
-  }
 
   tool("cc") {
     depfile = "{{output}}.d"
@@ -110,7 +80,7 @@ toolchain("fuchsia") {
     # existing .TOC file, overwrite it, otherwise, don't change it.
     tocfile = sofile + ".TOC"
     temporary_tocname = sofile + ".tmp"
-    link_command = "$ld $target_triple_flags $sysroot_flags -shared {{ldflags}} -o $unstripped_sofile $custom_lib_flags -Wl,--build-id -Wl,-soname=$soname @$rspfile"
+    link_command = "$ld $target_triple_flags $sysroot_flags -shared {{ldflags}} -o $unstripped_sofile -Wl,--build-id -Wl,-soname=$soname @$rspfile"
     toc_command = "{ $readelf -d $unstripped_sofile | grep SONAME ; $nm -gD -f p $unstripped_sofile | cut -f1-2 -d' '; } > $temporary_tocname"
     replace_command = "if ! cmp -s $temporary_tocname $tocfile; then mv $temporary_tocname $tocfile; fi"
     strip_command = "$strip -o $sofile $unstripped_sofile"
@@ -147,7 +117,7 @@ toolchain("fuchsia") {
     outfile = "{{root_out_dir}}/$exename"
     rspfile = "$outfile.rsp"
     unstripped_outfile = "{{root_out_dir}}/exe.unstripped/$exename"
-    command = "$ld $target_triple_flags $sysroot_flags {{ldflags}} -o $unstripped_outfile $custom_lib_flags -Wl,--build-id -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}} && ${strip} -o $outfile $unstripped_outfile"
+    command = "$ld $target_triple_flags $sysroot_flags {{ldflags}} -o $unstripped_outfile -Wl,--build-id -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}} && ${strip} -o $outfile $unstripped_outfile"
     description = "LINK $outfile"
     rspfile_content = "{{inputs}}"
     outputs = [
