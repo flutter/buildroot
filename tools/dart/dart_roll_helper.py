@@ -91,7 +91,8 @@ def get_deps():
 
 def update_deps():
   print_status('Updating Dart dependencies')
-  p = subprocess.Popen([update_dart_deps_path()], cwd=ENGINE_HOME)
+  p = subprocess.Popen([update_dart_deps_path(), '--delete_removed_deps'],
+                       cwd=ENGINE_HOME)
   p.wait()
 
 

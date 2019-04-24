@@ -60,6 +60,10 @@ def ParseArgs(args):
       type=str,
       help='Flutter DEPS file.',
       default=os.path.join(FLUTTER_ROOT, 'DEPS'))
+  parser.add_argument('--delete_removed_deps',
+                      help='Automatically remove deleted dependencies.',
+                      action='store_true',
+                      default=False)
   return parser.parse_args(args)
 
 def Main(argv):
@@ -86,8 +90,8 @@ def Main(argv):
   lines = file.readlines()
   i = 0
   while i < len(lines):
-    updatedfile.write(lines[i])
     if lines[i].startswith("  'dart_revision':"):
+      updatedfile.write(lines[i])
       i = i + 2
       updatedfile.writelines([
         '\n',
@@ -96,11 +100,31 @@ def Main(argv):
       while i < len(lines) and len(lines[i].strip()) > 0:
         i = i + 1
       for (k, v) in sorted(updated_deps.iteritems()):
-        updatedfile.write("  '%s': '%s',\n" % (k, v))
-      updatedfile.write('\n')
-    i = i + 1
+        if (v != '???') or not args.delete_removed_deps:
+          updatedfile.write("  '%s': '%s',\n" % (k, v))
+    elif lines[i].startswith("  'src/third_party/dart"):
+      write_dep = True
+      if (args.delete_removed_deps and
+          (len(missing_deps) > 0) and (i + 1 < len(lines))):
+        var_line = lines[i + 1]
+        for missing in missing_deps:
+          if missing in var_line:
+            write_dep = False
+            break
+      if write_dep:
+        updatedfile.writelines(lines[i:i+2])
+        updatedfile.write('\n')
 
-  if len(missing_deps) > 0:
+        # Handle case where there's a newline after each dependency key-value
+        # pair (this should always be the case, but this is less brittle).
+        if (i + 2 < len(lines)) and (lines[i + 2] == '\n'):
+          i = i + 1
+      i = i + 2
+    else:
+      updatedfile.write(lines[i])
+      i = i + 1
+
+  if not args.delete_removed_deps and len(missing_deps) > 0:
     print("Error: flutter dependencies %s removed from dart" % missing_deps)
     print("Intermediate results are in %s" % updatedfilename)
     return 1
