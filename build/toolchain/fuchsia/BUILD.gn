@@ -29,29 +29,31 @@ toolchain("fuchsia") {
   lib_dir_switch = "-L"
 
   packages = [
-    "zx",
-    "fidl_cpp",
-    "syslog",
-    "memfs",
-    "fit",
-    "fidl_base",
-    "fidl_cpp_sync",
-    "async-default",
-    "async",
-    "fidl-async",
-    "fidl_cpp_base",
-    "fdio",
-    "scenic_cpp",
-    "svc",
-    "async-loop",
-    "async-loop-cpp",
-    "fidl",
-    "sync",
-    "images_cpp",
+    # "zx",
+    # "fidl_cpp",
+    # "syslog",
+    # "memfs",
+    # "fit",
+    # "fidl_base",
+    # "fidl_cpp_sync",
+    # "async-default",
+    # "async",
+    # "fidl-async",
+    # "fidl_cpp_base",
+    # "fdio",
+    # "scenic_cpp",
+    # "svc",
+    # "async-loop",
+    # "async-loop-cpp",
+    # "fidl",
+    # "sync",
+    # "images_cpp",
   ]
 
   foreach(package, packages) {
-    sysroot_flags = " $sysroot_flags -I${fuchsia_sdk}/pkg/${package}/include "
+    package_include =
+        rebase_path("//fuchsia/gen/fidl/fuchsia.${package}", root_out_dir)
+    sysroot_flags = " $sysroot_flags -I${package_include} "
   }
 
   tool("cc") {
