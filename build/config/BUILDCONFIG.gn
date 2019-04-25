@@ -272,9 +272,11 @@ if (current_os == "win") {
   is_win = false
 }
 
+import("//build/toolchain/fuchsia/fuchsia.gni")
+
 # Some library targets may be built as different type depending on the target
 # platform. This variable specifies the default library type for each target.
-if (is_fuchsia) {
+if (is_fuchsia && !is_fuchsia_sdk) {
   default_library_type = "shared_library"
 } else {
   default_library_type = "static_library"
