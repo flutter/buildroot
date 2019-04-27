@@ -398,6 +398,8 @@ config("compiler") {
     cc_std = [ "-std=c++11" ]
   } else if (is_win) {
     cc_std = [ "/std:c++14" ]
+  } else if (is_fuchsia) {
+    cc_std = [ "-std=c++17" ]
   } else {
     cc_std = [ "-std=c++14" ]
   }
