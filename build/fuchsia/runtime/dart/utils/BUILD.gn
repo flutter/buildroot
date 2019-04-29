@@ -1,0 +1,35 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/fuchsia/fuchsia.gni")
+
+source_set("utils") {
+  sources = [
+    "files.cc",
+    "files.h",
+    "handle_exception.cc",
+    "handle_exception.h",
+    "inlines.h",
+    "logging.h",
+    "tempfs.cc",
+    "tempfs.h",
+    "vmo.cc",
+    "vmo.h",
+    "vmservice_object.cc",
+    "vmservice_object.h",
+  ]
+
+  deps = [
+    "$fuchsia_sdk:async-loop",
+    "$fuchsia_sdk:async-loop-cpp",
+    "$fuchsia_sdk:fdio",
+    "$fuchsia_sdk:fuchsia.crash",
+    "$fuchsia_sdk:fuchsia.mem",
+    "$fuchsia_sdk:memfs",
+    "$fuchsia_sdk:syslog",
+    "$fuchsia_sdk:zx",
+    "$fuchsia_sdk/lib/sys/cpp",
+    "$fuchsia_sdk/lib/vfs/cpp",
+  ]
+}
