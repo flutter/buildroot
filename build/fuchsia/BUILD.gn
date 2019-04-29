@@ -2,6 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-declare_args() {
-  fuchsia_sdk = "//flutter/shell/platform/fuchsia"
+import("//build/fuchsia/fuchsia.gni")
+
+if (is_fuchsia_sdk) {
+  fuchsia_sdk("sdk") {
+    meta = "$fuchsia_sdk_path/meta/manifest.json"
+  }
 }

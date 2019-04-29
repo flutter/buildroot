@@ -272,7 +272,7 @@ if (current_os == "win") {
   is_win = false
 }
 
-import("//build/toolchain/fuchsia/fuchsia.gni")
+import("//build/fuchsia/fuchsia.gni")
 
 # Some library targets may be built as different type depending on the target
 # platform. This variable specifies the default library type for each target.
@@ -577,7 +577,6 @@ set_defaults("test") {
 # doing cross-compiles. When not cross-compiling, this will be the same as the
 # default toolchain.
 import("//build/toolchain/custom/custom.gni")
-import("//build/toolchain/fuchsia/fuchsia.gni")
 
 if (custom_toolchain != "") {
   assert(custom_sysroot != "")
