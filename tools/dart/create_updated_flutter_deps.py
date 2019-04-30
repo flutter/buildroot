@@ -107,7 +107,6 @@ def Main(argv):
           for (dart_k, dart_v) in (new_deps.iteritems()):
             dart_k_suffix = dart_k[len('sdk/') if dart_k.startswith('sdk/') else 0:]
             if (k.endswith(dart_k_suffix)):
-              updated_value = dart_v
               updated_value = dart_v.replace(new_vars["dart_git"], "Var('dart_git') + '/")
               updated_value = updated_value.replace(old_vars["chromium_git"], "Var('chromium_git') + '")
 
