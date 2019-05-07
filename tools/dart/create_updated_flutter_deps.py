@@ -105,6 +105,10 @@ def Main(argv):
       for (k, v) in sorted(old_deps.iteritems()):
         if (k.startswith('src/third_party/dart/')):
           for (dart_k, dart_v) in (new_deps.iteritems()):
+            # Some elements in the deps section are dictionaries. We don't care
+            # about these, so skip them to avoid crashing below.
+            if isinstance(dart_v, dict):
+              continue
             dart_k_suffix = dart_k[len('sdk/') if dart_k.startswith('sdk/') else 0:]
             if (k.endswith(dart_k_suffix)):
               updated_value = dart_v.replace(new_vars["dart_git"], "Var('dart_git') + '/")
