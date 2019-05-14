@@ -4,6 +4,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+""" Genrate a Fuchsia FAR Archive from an asset manifest and a signing key.
+"""
+
 import argparse
 import collections
 import json
