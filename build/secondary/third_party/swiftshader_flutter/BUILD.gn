@@ -462,6 +462,17 @@ source_set("main") {
 
   if (is_mac) {
     sources += [ "$source_root/src/Main/FrameBufferOSX.mm" ]
+  } else if (is_linux) {
+    sources += [
+      "$source_root/src/Main/FrameBufferX11.cpp",
+      "$source_root/src/Main/libX11.cpp",
+    ]
+  } else if (is_win) {
+    sources += [
+      "$source_root/src/Main/FrameBufferDD.cpp",
+      "$source_root/src/Main/FrameBufferGDI.cpp",
+      "$source_root/src/Main/FrameBufferWin.cpp",
+    ]
   }
 
   deps = [
@@ -497,7 +508,7 @@ shared_library("egl") {
   if (is_mac) {
     sources += [ "$source_root/src/OpenGL/libEGL/OSXUtils.mm" ]
   } else if (is_linux) {
-    sources += [ "$source_root/src/libX11.cpp" ]
+    sources += [ "$source_root/src/WSI/libX11.cpp" ]
   }
 
   if (is_mac) {
@@ -508,7 +519,9 @@ shared_library("egl") {
     ]
   }
 
-  ldflags = [ "-Wl,-install_name,@executable_path/libEGL.dylib" ]
+  if (is_mac) {
+    ldflags = [ "-Wl,-install_name,@executable_path/libEGL.dylib" ]
+  }
 }
 
 shared_library("gles") {
@@ -567,7 +580,9 @@ shared_library("gles") {
     ]
   }
 
-  ldflags = [ "-Wl,-install_name,@executable_path/libGLESv2.dylib" ]
+  if (is_mac) {
+    ldflags = [ "-Wl,-install_name,@executable_path/libGLESv2.dylib" ]
+  }
 }
 
 group("swiftshader") {
