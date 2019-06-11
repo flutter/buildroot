@@ -11,12 +11,35 @@ config("internal_config") {
     "$source_root/src/OpenGL",
   ]
 
-  cflags = [
-    "-Wno-header-hygiene",
-    "-Wno-thread-safety-analysis",
-    "-Wno-undefined-var-template",
-    "-Wno-unneeded-internal-declaration",
-  ]
+  if (is_win) {
+    cflags = [
+      "/wd4005",
+      "/wd4018",
+      "/wd4141",
+      "/wd4146",
+      "/wd4201",
+      "/wd4245",
+      "/wd4267",
+      "/wd4291",
+      "/wd4310",
+      "/wd4324",
+      "/wd4334",
+      "/wd4389",
+      "/wd4701",
+      "/wd4702",
+      "/wd4703",
+      "/wd4706",
+      "/wd4800",
+      "/wd5030",
+    ]
+  } else {
+    cflags = [
+      "-Wno-header-hygiene",
+      "-Wno-thread-safety-analysis",
+      "-Wno-undefined-var-template",
+      "-Wno-unneeded-internal-declaration",
+    ]
+  }
 
   defines = [ "NO_SANITIZE_FUNCTION=" ]
 }
@@ -29,6 +52,10 @@ source_set("compiler") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   sources = [
     "$source_root/src/OpenGL/compiler/AnalyzeCallDepth.cpp",
@@ -60,6 +87,10 @@ source_set("subzero") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   include_dirs = [
     "$source_root/third_party/subzero",
@@ -95,7 +126,11 @@ source_set("subzero") {
     defines += [ "SUBZERO_USE_MICROSOFT_ABI" ]
   }
 
-  cflags = [ "-Wno-macro-redefined" ]
+  cflags = []
+
+  if (!is_win) {
+    cflags += [ "-Wno-macro-redefined" ]
+  }
 
   if (target_cpu == "x64") {
     defines += [
@@ -202,6 +237,10 @@ source_set("subzero") {
 source_set("reactor") {
   configs += [ ":internal_config" ]
 
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
+
   sources = [
     "$source_root/src/Reactor/Debug.cpp",
     "$source_root/src/Reactor/ExecutableMemory.cpp",
@@ -218,6 +257,10 @@ source_set("renderer") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   sources = [
     "$source_root/src/Renderer/Blitter.cpp",
@@ -249,6 +292,10 @@ source_set("opengl_common") {
 
   configs += [ ":internal_config" ]
 
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
+
   sources = [
     # "$source_root/src/Common/SharedLibrary.cpp",
     "$source_root/src/OpenGL/common/Image.cpp",
@@ -262,6 +309,10 @@ source_set("common") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   sources = [
     "$source_root/src/Common/CPUID.cpp",
@@ -282,6 +333,10 @@ source_set("preprocessor") {
 
   configs += [ ":internal_config" ]
 
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
+
   sources = [
     "$source_root/src/OpenGL/compiler/preprocessor/Macro.cpp",
     "$source_root/src/OpenGL/compiler/preprocessor/MacroExpander.cpp",
@@ -295,6 +350,10 @@ source_set("opengl_preprocessor") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   sources = [
     "$source_root/src/OpenGL/compiler/preprocessor/DiagnosticsBase.cpp",
@@ -315,6 +374,10 @@ source_set("opengl_compiler") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   sources = [
     "$source_root/src/OpenGL/compiler/AnalyzeCallDepth.cpp",
@@ -357,6 +420,10 @@ source_set("shader") {
 
   configs += [ ":internal_config" ]
 
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
+
   sources = [
     "$source_root/src/Shader/Constants.cpp",
     "$source_root/src/Shader/PixelPipeline.cpp",
@@ -382,6 +449,10 @@ source_set("system") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   sources = [
     "$source_root/src/System/CPUID.cpp",
@@ -410,6 +481,10 @@ source_set("device") {
   public = []
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   include_dirs = [ "$source_root/third_party/SPIRV-Headers/include" ]
 
@@ -454,6 +529,10 @@ source_set("main") {
 
   configs += [ ":internal_config" ]
 
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
+
   sources = [
     "$source_root/src/Main/Config.cpp",
     "$source_root/src/Main/FrameBuffer.cpp",
@@ -481,17 +560,29 @@ source_set("main") {
 }
 
 shared_library("egl") {
-  output_name = "EGL"
+  if (is_win) {
+    output_name = "libEGL"
+  } else {
+    output_name = "EGL"
+  }
 
   public = []
 
   configs += [ ":internal_config" ]
 
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
+
   public_configs = [ ":swiftshader_config" ]
 
   defines = [ "EGL_EGLEXT_PROTOTYPES=1" ]
 
-  defines += [ "EGLAPI=__attribute__((visibility(\"default\")))" ]
+  if (is_win) {
+    defines += [ "EGLAPI=__declspec(dllexport)" ]
+  } else {
+    defines += [ "EGLAPI=__attribute__((visibility(\"default\")))" ]
+  }
 
   sources = [
     "$source_root/src/Common/SharedLibrary.cpp",
@@ -525,9 +616,17 @@ shared_library("egl") {
 }
 
 shared_library("gles") {
-  output_name = "GLESv2"
+  if (is_win) {
+    output_name = "libGLESv2"
+  } else {
+    output_name = "GLESv2"
+  }
 
   configs += [ ":internal_config" ]
+
+  if (is_win) {
+    configs -= [ "//build/config/win:unicode" ]
+  }
 
   public_configs = [ ":swiftshader_config" ]
 
@@ -535,7 +634,12 @@ shared_library("gles") {
 
   public = []
 
-  defines = [ "GL_APICALL=__attribute__((visibility(\"default\")))" ]
+  defines = [ "GL_API=GL_APICALL" ]
+  if (is_win) {
+    defines += [ "GL_APICALL=__declspec(dllexport)" ]
+  } else {
+    defines += [ "GL_APICALL=__attribute__((visibility(\"default\")))" ]
+  }
 
   sources = [
     "$source_root/src/Common/SharedLibrary.cpp",
@@ -569,8 +673,11 @@ shared_library("gles") {
     ":renderer",
   ]
 
+  libs = []
+  ldflags = []
+
   if (is_mac) {
-    libs = [
+    libs += [
       "IOSurface.framework",
       "QuartzCore.framework",
       "ImageIO.framework",
@@ -578,10 +685,9 @@ shared_library("gles") {
       "CoreGraphics.framework",
       "AppKit.framework",
     ]
-  }
-
-  if (is_mac) {
-    ldflags = [ "-Wl,-install_name,@executable_path/libGLESv2.dylib" ]
+    ldflags += [ "-Wl,-install_name,@executable_path/libGLESv2.dylib" ]
+  } else if (is_win) {
+    libs += [ "dxguid.lib" ]
   }
 }
 
