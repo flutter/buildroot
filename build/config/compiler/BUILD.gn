@@ -29,6 +29,10 @@ declare_args() {
   # Set this flag when linking with custom allocators that don't satisfy
   # default ::operator new(size_t) alignment guarantees.
   operator_new_alignment = "default"
+
+  # By default, API calls to deprecated methods are errors. While prototyping,
+  # this flag may be set to allow such calls.
+  allow_deprecated_api_calls = false
 }
 
 # default_include_dirs ---------------------------------------------------------
@@ -599,20 +603,15 @@ config("runtime_library") {
     }
   }
 
-  # Linux standard liburary setup.
-  # TODO(chinmaygarde): We are only using C++14 on x64 hosts (with a static
-  # libcxx and libcxxabi from buildtools) because the static libraries
-  # in buildtools are not compatible with x86. This will be rectified soon
-  # with libcxx and libcxxabi providing their own GN files. The "current_cpu"
-  # check can then be removed. So far, the only target that need x86 don't
-  # also require C++14.
-  # Tracked in https://fuchsia.atlassian.net/browse/TO-61
+  # Linux standard library setup.
+  # We compile our own libc++ on all Linux targets except i386 (for
+  # gen_snapshot) where this is not supported.
   if (is_linux) {
     if (current_cpu != "x86") {
-      cflags_cc += [ "-stdlib=libc++" ]
-      ldflags += [
-        "-stdlib=libc++",
-        "-static-libstdc++",
+      cflags_cc += [ "-nostdinc++" ]
+      include_dirs = [
+        "//third_party/libcxx/include",
+        "//third_party/libcxxabi/include",
       ]
     } else {
       cflags_cc += [ "-stdlib=libstdc++" ]
@@ -664,6 +663,10 @@ if (is_win) {
     # availability is newer than the deployment target. This is not
     # required when compiling Chrome for iOS.
     default_warning_flags += [ "-Wunguarded-availability" ]
+  }
+
+  if (allow_deprecated_api_calls) {
+    default_warning_flags += [ "-Wno-deprecated-declarations" ]
   }
 }
 
