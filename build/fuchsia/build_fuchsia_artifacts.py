@@ -42,7 +42,7 @@ def BuildNinjaTargets(variant_dir, targets):
 def RemoveDirectoryIfExists(path):
   if not os.path.exists(path):
     return
-  
+
   if os.path.isfile(path) or os.path.islink(path):
     os.unlink(path)
   else:
@@ -84,8 +84,8 @@ def BuildBucket():
   CopyToBucket('fuchsia_debug/icudtl.dat', 'flutter/debug/icudtl.dat')
   CopyToBucket('fuchsia_profile/icudtl.dat', 'flutter/profile/icudtl.dat')
   CopyToBucket('fuchsia_release/icudtl.dat', 'flutter/release/icudtl.dat')
-  
-def ProcessCIPDPakcage(upload):
+
+def ProcessCIPDPakcage(upload, engine_version):
   # Copy the CIPD YAML template from the source directory to be next to the bucket
   # we are about to package.
   cipd_yaml = os.path.join(_script_dir, 'fuchsia.cipd.yaml')
@@ -99,6 +99,8 @@ def ProcessCIPDPakcage(upload):
       'fuchsia.cipd.yaml',
       '-ref',
       'latest',
+      '-tag',
+      'git_rev:%s' % engine_version
     ]
   else:
     command = [
@@ -117,6 +119,9 @@ def main():
 
   parser.add_argument('--upload', default=False, action='store_true',
       help='If set, uploads the CIPD package and tags it as the latest.')
+
+  parser.add_argument('--engine-version', required=True,
+      help='Specifies the flutter engine SHA.')
 
   args = parser.parse_args()
 
@@ -158,7 +163,7 @@ def main():
 
   BuildBucket()
 
-  ProcessCIPDPakcage(args.upload)
+  ProcessCIPDPakcage(args.upload, args.engine_version)
 
 
 if __name__ == '__main__':
