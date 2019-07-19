@@ -5,7 +5,7 @@
 import("//build/config/sysroot.gni")
 
 config("sdk") {
-  common_flags = [ "-stdlib=libc++" ]
+  common_flags = []
 
   cflags = common_flags
   ldflags = common_flags
