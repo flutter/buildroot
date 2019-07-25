@@ -99,22 +99,3 @@ source_set("glfw") {
   configs -= [ "//build/config/compiler:chromium_code" ]
   configs += [ "//build/config/compiler:no_chromium_code" ]
 }
-
-config("relative_glad_headers") {
-  include_dirs = [ "$_checkout_dir/deps" ]
-}
-
-source_set("glad") {
-  public = [
-    "$_checkout_dir/deps/glad/glad.h",
-  ]
-
-  sources = [
-    "$_checkout_dir/deps/glad.c",
-  ]
-
-  public_configs = [ ":relative_glad_headers" ]
-
-  configs -= [ "//build/config/compiler:chromium_code" ]
-  configs += [ "//build/config/compiler:no_chromium_code" ]
-}

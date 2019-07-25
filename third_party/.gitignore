@@ -10,6 +10,7 @@
 *
 !.gitignore
 !expat/
+!glad/
 !fontconfig/
 !libpng/
 !libxml/
