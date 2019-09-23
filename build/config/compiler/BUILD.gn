@@ -529,6 +529,15 @@ config("runtime_library") {
     ]
   }
 
+  if (use_flutter_cxx) {
+    cflags_cc += [ "-nostdinc++" ]
+    cflags_objcc += [ "-nostdinc++" ]
+    include_dirs = [
+      "//third_party/libcxx/include",
+      "//third_party/libcxxabi/include",
+    ]
+  }
+
   # Android standard library setup.
   if (is_android) {
     if (is_clang) {
@@ -586,18 +595,15 @@ config("runtime_library") {
     }
   }
 
-  if (!is_win) {
-    common_cc_flags = [ "-nostdinc++" ]
-
-    cflags_cc += common_cc_flags
-    cflags_objcc += common_cc_flags
-
-    include_dirs = [
-      "//third_party/libcxx/include",
-      "//third_party/libcxxabi/include",
-    ]
-
-    ldflags += [ "-nostdlib++" ]
+  # Linux standard library setup.
+  # We compile our own libc++ on all Linux targets except i386 (for
+  # gen_snapshot) where this is not supported.
+  if (is_linux) {
+    if (!use_flutter_cxx) {
+      cflags_cc += [ "-stdlib=libstdc++" ]
+      ldflags += [ "-stdlib=libstdc++" ]
+      libs += [ "gcc" ]
+    }
   }
 }
 
