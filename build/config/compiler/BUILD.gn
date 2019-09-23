@@ -532,6 +532,7 @@ config("runtime_library") {
   if (use_flutter_cxx) {
     cflags_cc += [ "-nostdinc++" ]
     cflags_objcc += [ "-nostdinc++" ]
+    ldflags += [ "-nostdlib++" ]
     include_dirs = [
       "//third_party/libcxx/include",
       "//third_party/libcxxabi/include",
@@ -642,6 +643,7 @@ if (is_win) {
     # Disables.
     "-Wno-missing-field-initializers",  # "struct foo f = {0};"
     "-Wno-unused-parameter",  # Unused function parameters.
+    "-Wno-implicit-int-float-conversion",
   ]
 
   if (is_mac || is_ios) {
