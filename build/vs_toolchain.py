@@ -416,7 +416,7 @@ def _CopyDebugger(target_dir, target_cpu):
 def _GetDesiredVsToolchainHashes():
   """Load a list of SHA1s corresponding to the toolchains that we want installed
   to build with."""
-  #XXX VS 2017 Update 9 (15.9.12) with 10.0.18362 SDK, 10.0.17763 version of
+  # VS 2019 Update 9 (16.3.29324.140) with 10.0.18362 SDK, 10.0.17763 version of
   # Debuggers, and 10.0.17134 version of d3dcompiler_47.dll, with ARM64
   # libraries.
   toolchain_hash = '8f58c55897a3282ed617055775a77ec3db771b88'
