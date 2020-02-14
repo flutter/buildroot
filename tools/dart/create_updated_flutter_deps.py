@@ -112,6 +112,8 @@ def Main(argv):
                 updated_value = updated_value.replace(old_vars["chromium_git"], "Var('chromium_git') + '")
 
                 plain_v = dart_k[dart_k.rfind('/') + 1:]
+                # This dependency has to be special-cased here because the
+                # repository name is not the same as the directory name.
                 if plain_v == "quiver":
                   plain_v = "quiver-dart"
                 if ('dart_' + plain_v + '_tag' in updated_vars):
