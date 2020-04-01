@@ -21,9 +21,10 @@ config("extra_warnings") {
     "-Wnewline-eof",
   ]
 
-  if (is_fuchsia) {
-    cflags += [ "-Wno-implicit-int-float-conversion" ]
-  }
+  cflags += [
+    "-Wno-implicit-int-float-conversion",
+    "-Wno-non-c-typedef-for-linkage",
+  ]
 
   defines = [ "_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS" ]
 }
