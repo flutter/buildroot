@@ -21,14 +21,5 @@ config("extra_warnings") {
     "-Wnewline-eof",
   ]
 
-  cflags += [
-    # ICU does this in plurrule.cpp
-    # TODO(https://github.com/flutter/flutter/issues/53728)
-    "-Wno-implicit-int-float-conversion",
-    # Wuffs does this in a number of places.
-    # TODO(https://github.com/flutter/flutter/issues/53729)
-    "-Wno-non-c-typedef-for-linkage",
-  ]
-
   defines = [ "_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS" ]
 }
