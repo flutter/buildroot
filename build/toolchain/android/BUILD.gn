@@ -65,7 +65,9 @@ template("android_gcc_toolchain") {
       cxx = compiler_prefix + tool_prefix + "g++"
     }
 
-    ar = tool_prefix + "ar"
+    # The NDK shipped ar utility is out of date, and using it will cause linker
+    # failures for version inconsistencies.
+    ar = "ar"
     ld = cxx
     readelf = compiler_prefix + tool_prefix + "readelf"
     nm = compiler_prefix + tool_prefix + "nm"
