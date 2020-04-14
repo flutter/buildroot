@@ -4,7 +4,7 @@
 
 assert(is_ios)
 
-ocmock_path = "../../../../third_party/ocmock/Source"
+ocmock_path = "//third_party/ocmock/Source"
 
 # OCMock headers use `#import <OCMock/Foo.h>`.
 config("ocmock_config") {
