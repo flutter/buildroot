@@ -9,12 +9,12 @@ import argparse
 import os
 import sys
 
-def main(target_directory, file_type):
+def main(target_directory, file_extension):
   for root, dirs, files in os.walk(target_directory):
     files = [f for f in files if not f[0] == '.']
     dirs[:] = [d for d in dirs if not d[0] == '.']
     for f in files:
-      if file_type is None or os.path.splitext(f)[-1] == file_type:
+      if file_extension is None or os.path.splitext(f)[-1] == file_extension:
         path = os.path.join(root, f)
         print path
 
@@ -27,12 +27,12 @@ if __name__ == '__main__':
                       type=str,
                       required=True,
                       help="The target directory")
-  parser.add_argument("--file-type",
-                      dest="file_type",
-                      metavar="<file-type>",
+  parser.add_argument("--file-extension",
+                      dest="file_extension",
+                      metavar="<file-extension>",
                       type=str,
                       required=False,
-                      help="File types to filter")
+                      help="File extension to filter")
 
   args = parser.parse_args()
-  sys.exit(main(args.target_directory, args.file_type))
+  sys.exit(main(args.target_directory, args.file_extension))
