@@ -642,6 +642,7 @@ if (is_win) {
     "/wd4311",  # Pointer truncation from PVOID to DWORD.
     "/wd4477",  # Format string requires wchar_t*
   ]
+  import("//build/toolchain/goma.gni")
   if (is_clang && use_goma) {
     # goma compilation doesn't preserve file case, so don't warn about
     # case-mismatches.
