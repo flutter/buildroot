@@ -188,7 +188,6 @@ template("msvc_toolchain") {
       description = "LINK $binary_output"
       outputs = [
         binary_output,
-        "{{root_out_dir}}/{{target_output_name}}.lib",
       ]
 
       # The use of inputs_newline is to work around a fixed per-line buffer
