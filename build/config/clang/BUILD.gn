@@ -12,14 +12,16 @@ config("find_bad_constructs") {
 # Enables some extra Clang-specific warnings. Some third-party code won't
 # compile with these so may want to remove this config.
 config("extra_warnings") {
-  cflags = [
-    # Warns when a const char[] is converted to bool.
-    "-Wstring-conversion",
+  if (!is_win) {
+    cflags = [
+      # Warns when a const char[] is converted to bool.
+      "-Wstring-conversion",
 
-    # Warns when a source file doesn't have a newline at end-of-file.
-    # This is to match Fuchsia, which enables this warning.
-    "-Wnewline-eof",
-  ]
+      # Warns when a source file doesn't have a newline at end-of-file.
+      # This is to match Fuchsia, which enables this warning.
+      "-Wnewline-eof",
+    ]
+  }
 
   defines = [ "_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS" ]
 }

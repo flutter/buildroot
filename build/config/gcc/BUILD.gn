@@ -19,7 +19,10 @@ config("symbol_visibility_hidden") {
   # config since that can almost always be applied.
   if (!enable_profiling) {
     defines = [ "_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS" ]
-    cflags = [ "-fvisibility=hidden" ]
+
+    if (is_clang && !is_win) {
+      cflags = [ "-fvisibility=hidden" ]
+    }
   }
 }
 

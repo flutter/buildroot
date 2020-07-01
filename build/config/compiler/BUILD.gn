@@ -78,6 +78,8 @@ config("compiler") {
       "/GS",  # Enable buffer security checking.
       "/FS",  # Preserve previous PDB behavior.
     ]
+
+    ldflags += [ "/ignore:4217" ]
   } else {
     # Common GCC compiler flags setup.
     # --------------------------------
@@ -324,6 +326,7 @@ config("compiler") {
       "STRICT=1",
       "-s",
       "WARN_UNALIGNED=1",
+
       # Reduces global namespace pollution.
       "-s",
       "MODULARIZE=1",
@@ -535,6 +538,8 @@ config("runtime_library") {
       "_CRT_SECURE_NO_DEPRECATE",
       "_HAS_EXCEPTIONS=0",
       "_SCL_SECURE_NO_DEPRECATE",
+      "_CRT_NONSTDC_NO_WARNINGS",
+      "_CRT_NONSTDC_NO_DEPRECATE",
     ]
   }
 
@@ -642,14 +647,35 @@ if (is_win) {
     "/wd4311",  # Pointer truncation from PVOID to DWORD.
     "/wd4477",  # Format string requires wchar_t*
   ]
-  import("//build/toolchain/goma.gni")
-  if (is_clang && use_goma) {
-    # goma compilation doesn't preserve file case, so don't warn about
-    # case-mismatches.
-    default_warning_flags += [
+
+  if (is_clang) {
+    # These warning flags seem to be Clang specific in addition to those
+    # specified for MSVC above.
+    extra_warning_flags = [
+      # Warnings as errors.
+      "-Werror",
+
+      # Some third party dependencies like ICU add flags that are not supported
+      # by clang-cl yet.
+      "-Wno-unknown-argument",
+
       "-Wno-nonportable-include-path",
       "-Wno-nonportable-system-include-path",
+      "-Wno-implicit-int-float-conversion",
+      "-Wno-double-promotion",
+      "-Wno-ignored-pragma-optimize",
+      "-Wno-microsoft-unqualified-friend",
+      "-Wno-microsoft-cast",
+      "-Wno-tautological-constant-out-of-range-compare",
+      "-Wno-string-compare",
+      "-Wno-undefined-var-template",
+
+      # TODO: There only seems to one legitimate case of this happening in Dart.
+      # Patch that callsite or move the flag to Dart GN rules.
+      "-Wno-deprecated-declarations",
     ]
+    default_warning_flags += extra_warning_flags
+    default_warning_flags_cc += extra_warning_flags
   }
 } else {
   # Common GCC warning setup.
@@ -667,6 +693,7 @@ if (is_win) {
     default_warning_flags += [
       # zlib needs this
       "-Wno-shift-negative-value",
+
       # freetype2 needs these two
       "-Wno-unused-function",
       "-Wno-unused-variable",
@@ -919,8 +946,11 @@ config("no_optimize") {
     }
     ldflags = common_optimize_on_ldflags
   } else if (is_wasm) {
-    cflags = [ "-O0", "-g4" ]
-  } else  {
+    cflags = [
+      "-O0",
+      "-g4",
+    ]
+  } else {
     cflags = [ "-O0" ]
   }
 }
