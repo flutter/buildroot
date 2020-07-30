@@ -94,11 +94,7 @@ template("msvc_toolchain") {
       # TODO(brettw) enable this when GN support in the binary has been rolled.
       #precompiled_header_type = "msvc"
       pdbname = "{{target_out_dir}}/{{target_output_name}}_c.pdb"
-      flags = ""
-      if (is_clang && invoker.current_cpu == "x86") {
-        flags = "-m32"
-      }
-      command = "ninja -t msvc -e $env -- $cl $flags /nologo /showIncludes /FC @$rspfile /c {{source}} /Fo{{output}} /Fd$pdbname"
+      command = "ninja -t msvc -e $env -- $cl /nologo /showIncludes /FC @$rspfile /c {{source}} /Fo{{output}} /Fd$pdbname"
       depsformat = "msvc"
       description = "CC {{output}}"
       outputs = [
@@ -137,12 +133,12 @@ template("msvc_toolchain") {
     }
 
     tool("asm") {
-      # TODO(brettw): "/safeseh" assembler argument is hardcoded here. Extract
-      # assembler flags to a variable like cflags. crbug.com/418613
+      is_msvc_assembler = true
       if (toolchain_args.current_cpu == "x64") {
         ml = "ml64.exe"
         x64 = "-D_ML64_X64"
       } else if (toolchain_args.current_cpu == "arm64") {
+        is_msvc_assembler = false
         prefix = rebase_path("$clang_base_path/bin", root_build_dir)
         ml = "${goma_prefix}${prefix}/clang_cl.exe --target=arm64-windows"
         x64 = ""
@@ -151,12 +147,10 @@ template("msvc_toolchain") {
         x64 = ""
       }
       command = "$python_path gyp-win-tool asm-wrapper $env $ml $x64 {{defines}} {{include_dirs}} {{asmflags}} "
-      if (toolchain_args.current_cpu == "arm64") {
-        # XXX: look into where safeseh came from/went; Chromium didn't have it
-        # in the arm CL.
+      if (is_msvc_assembler) {
         command += "-c -o{{output}} {{source}}"
       } else {
-        command += "/safeseh /c /Fo{{output}} {{source}}"
+        command += "/c /Fo{{output}} {{source}}"
       }
       outputs = [
         "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
@@ -277,7 +271,6 @@ template("win_toolchains") {
   }
 }
 
-# TODO: Try removing this; it is likely unused.
 if (target_cpu == "x86") {
   win_toolchains("x86") {
     toolchain_arch = "x86"
