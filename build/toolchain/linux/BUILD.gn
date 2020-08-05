@@ -100,6 +100,7 @@ gcc_toolchain("clang_arm64") {
   nm = "nm"
   ar = "ar"
   ld = cxx
+  strip = "${compiler_prefix}$prefix/llvm-strip"
 
   toolchain_cpu = "arm64"
   toolchain_os = "linux"
