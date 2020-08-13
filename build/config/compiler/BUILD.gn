@@ -336,6 +336,7 @@ config("compiler") {
       "STRICT=1",
       "-s",
       "WARN_UNALIGNED=1",
+
       # Reduces global namespace pollution.
       "-s",
       "MODULARIZE=1",
@@ -679,6 +680,7 @@ if (is_win) {
     default_warning_flags += [
       # zlib needs this
       "-Wno-shift-negative-value",
+
       # freetype2 needs these two
       "-Wno-unused-function",
       "-Wno-unused-variable",
@@ -708,6 +710,14 @@ if (is_win) {
 
   if (allow_deprecated_api_calls) {
     default_warning_flags += [ "-Wno-deprecated-declarations" ]
+  }
+
+  if (is_fuchsia) {
+    default_warning_flags += [
+      "-Wno-deprecated-copy",  # Multiple
+      "-Wno-psabi",  # Skia
+      "-Wno-non-c-typedef-for-linkage",  # Skia
+    ]
   }
 }
 
@@ -931,8 +941,11 @@ config("no_optimize") {
     }
     ldflags = common_optimize_on_ldflags
   } else if (is_wasm) {
-    cflags = [ "-O0", "-g4" ]
-  } else  {
+    cflags = [
+      "-O0",
+      "-g4",
+    ]
+  } else {
     cflags = [ "-O0" ]
   }
 }
