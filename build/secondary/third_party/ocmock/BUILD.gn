@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-assert(is_ios)
+#assert(is_ios)
 
 ocmock_path = "//third_party/ocmock/Source"
 
@@ -17,9 +17,13 @@ static_library("ocmock") {
   all_dependent_configs = [ ":ocmock_config" ]
   cflags = [
     "-fvisibility=default",
-    "-mios-simulator-version-min=$ios_testing_deployment_target",
+    #"-mios-simulator-version-min=$ios_testing_deployment_target",
     "-Wno-misleading-indentation",
+    "-ObjC",
   ]
+
+  # TODO(justinmc): Split out the sources here into a separate source_set, and
+  # create another static_library called ocmock_mac.
   sources = [
     "$ocmock_path/OCMock/NSInvocation+OCMAdditions.h",
     "$ocmock_path/OCMock/NSInvocation+OCMAdditions.m",
