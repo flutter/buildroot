@@ -9,6 +9,8 @@ config("ocmock_config") {
   include_dirs = [ "$ocmock_path" ]
 }
 
+# Target that compiles all sources to .o files but does not produce a static
+# library for use in macOS desktop tests.
 source_set("ocmock_src") {
   configs -= [ "//build/config/compiler:chromium_code" ]
   all_dependent_configs = [ ":ocmock_config" ]
@@ -60,18 +62,22 @@ source_set("ocmock_src") {
     "$ocmock_path/OCMock/OCMLocation.m",
     "$ocmock_path/OCMock/OCMMacroState.h",
     "$ocmock_path/OCMock/OCMMacroState.m",
+    "$ocmock_path/OCMock/OCMNonRetainingObjectReturnValueProvider.h",
+    "$ocmock_path/OCMock/OCMNonRetainingObjectReturnValueProvider.m",
     "$ocmock_path/OCMock/OCMNotificationPoster.h",
     "$ocmock_path/OCMock/OCMNotificationPoster.m",
+    "$ocmock_path/OCMock/OCMObjectReturnValueProvider.h",
+    "$ocmock_path/OCMock/OCMObjectReturnValueProvider.m",
     "$ocmock_path/OCMock/OCMObserverRecorder.h",
     "$ocmock_path/OCMock/OCMObserverRecorder.m",
     "$ocmock_path/OCMock/OCMPassByRefSetter.h",
     "$ocmock_path/OCMock/OCMPassByRefSetter.m",
+    "$ocmock_path/OCMock/OCMQuantifier.h",
+    "$ocmock_path/OCMock/OCMQuantifier.m",
     "$ocmock_path/OCMock/OCMRealObjectForwarder.h",
     "$ocmock_path/OCMock/OCMRealObjectForwarder.m",
     "$ocmock_path/OCMock/OCMRecorder.h",
     "$ocmock_path/OCMock/OCMRecorder.m",
-    "$ocmock_path/OCMock/OCMReturnValueProvider.h",
-    "$ocmock_path/OCMock/OCMReturnValueProvider.m",
     "$ocmock_path/OCMock/OCMStubRecorder.h",
     "$ocmock_path/OCMock/OCMStubRecorder.m",
     "$ocmock_path/OCMock/OCMVerifier.h",
@@ -88,8 +94,10 @@ source_set("ocmock_src") {
   ]
 }
 
-# This is a static library so it can be used by xcode's build system too.
+# Generates a static library, used in iOS unit test targets
 static_library("ocmock") {
+  # Force the static lib to include code from dependencies
+  complete_static_lib = true
   if (is_ios) {
     cflags = [
       "-mios-simulator-version-min=$ios_testing_deployment_target",
