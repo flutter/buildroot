@@ -98,7 +98,7 @@ gcc_toolchain("clang_arm64") {
 
   readelf = "readelf"
   nm = "nm"
-  ar = "ar"
+  ar = "${prefix}/llvm-ar"
   ld = cxx
   llvm_objcopy = "${prefix}/llvm-objcopy"
 
