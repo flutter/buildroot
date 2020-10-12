@@ -9,12 +9,10 @@ config("ocmock_config") {
   include_dirs = [ "$ocmock_path" ]
 }
 
-source_set("ocmock_sources") {
-  configs -= [
-    "//build/config/compiler:chromium_code",
-    "//build/config/gcc:symbol_visibility_hidden",
-    "//build/config:symbol_visibility_hidden",
-  ]
+# Target that compiles all sources to .o files but does not produce a static
+# library for use in macOS desktop tests.
+source_set("ocmock_src") {
+  configs -= [ "//build/config/compiler:chromium_code" ]
   all_dependent_configs = [ ":ocmock_config" ]
   cflags = [
     "-fvisibility=default",
@@ -103,11 +101,21 @@ source_set("ocmock_sources") {
 }
 
 shared_library("ocmock_shared") {
-  deps = [ ":ocmock_sources" ]
+  deps = [ ":ocmock_src" ]
   cflags = [ "-fvisibility=default" ]
   ldflags = [ "-Wl,-install_name,@rpath/Frameworks/libocmock_shared.dylib" ]
 }
 
+# Generates a static library, used in iOS unit test targets
 static_library("ocmock") {
-  deps = [ ":ocmock_sources" ]
+  # Force the static lib to include code from dependencies
+  complete_static_lib = true
+  if (is_ios) {
+    cflags = [
+      "-mios-simulator-version-min=$ios_testing_deployment_target",
+    ]
+  }
+  public_deps = [
+    ":ocmock_src",
+  ]
 }
