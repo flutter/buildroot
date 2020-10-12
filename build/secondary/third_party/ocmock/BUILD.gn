@@ -9,18 +9,21 @@ config("ocmock_config") {
   include_dirs = [ "$ocmock_path" ]
 }
 
-static_library("ocmock") {
-  configs -= [ "//build/config/compiler:chromium_code" ]
+source_set("ocmock_sources") {
+  configs -= [
+    "//build/config/compiler:chromium_code",
+    "//build/config/gcc:symbol_visibility_hidden",
+    "//build/config:symbol_visibility_hidden",
+  ]
   all_dependent_configs = [ ":ocmock_config" ]
   cflags = [
     "-fvisibility=default",
     "-Wno-misleading-indentation",
   ]
   if (is_ios) {
-    cflags += [
-      "-mios-simulator-version-min=$ios_testing_deployment_target",
-    ]
+    cflags += [ "-mios-simulator-version-min=$ios_testing_deployment_target" ]
   }
+
   sources = [
     "$ocmock_path/OCMock/NSInvocation+OCMAdditions.h",
     "$ocmock_path/OCMock/NSInvocation+OCMAdditions.m",
@@ -95,4 +98,16 @@ static_library("ocmock") {
     "$ocmock_path/OCMock/OCProtocolMockObject.h",
     "$ocmock_path/OCMock/OCProtocolMockObject.m",
   ]
+
+  libs = [ "Foundation.framework" ]
+}
+
+shared_library("ocmock_shared") {
+  deps = [ ":ocmock_sources" ]
+  cflags = [ "-fvisibility=default" ]
+  ldflags = [ "-Wl,-install_name,@rpath/Frameworks/libocmock_shared.dylib" ]
+}
+
+static_library("ocmock") {
+  deps = [ ":ocmock_sources" ]
 }
