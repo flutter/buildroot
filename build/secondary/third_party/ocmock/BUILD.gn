@@ -12,12 +12,20 @@ config("ocmock_config") {
 # Target that compiles all sources to .o files but does not produce a static
 # library for use in macOS desktop tests.
 source_set("ocmock_src") {
-  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs -= [
+    "//build/config/compiler:chromium_code",
+    "//build/config/gcc:symbol_visibility_hidden",
+    "//build/config:symbol_visibility_hidden",
+  ]
   all_dependent_configs = [ ":ocmock_config" ]
   cflags = [
     "-fvisibility=default",
     "-Wno-misleading-indentation",
   ]
+  if (is_ios) {
+    cflags += [ "-mios-simulator-version-min=$ios_testing_deployment_target" ]
+  }
+
   sources = [
     "$ocmock_path/OCMock/NSInvocation+OCMAdditions.h",
     "$ocmock_path/OCMock/NSInvocation+OCMAdditions.m",
@@ -92,6 +100,14 @@ source_set("ocmock_src") {
     "$ocmock_path/OCMock/OCProtocolMockObject.h",
     "$ocmock_path/OCMock/OCProtocolMockObject.m",
   ]
+
+  libs = [ "Foundation.framework" ]
+}
+
+shared_library("ocmock_shared") {
+  deps = [ ":ocmock_src" ]
+  cflags = [ "-fvisibility=default" ]
+  ldflags = [ "-Wl,-install_name,@rpath/Frameworks/libocmock_shared.dylib" ]
 }
 
 # Generates a static library, used in iOS unit test targets
