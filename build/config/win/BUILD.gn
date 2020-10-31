@@ -32,6 +32,11 @@ config("winver") {
   ]
 }
 
+# When OS target is WinUWP use WINUWP as the preprocessor flag to conditionalize.
+config("flutter_windows_winuwp_defs") {
+  defines = [ "WINUWP" ]
+}
+
 # Linker flags for Windows SDK setup, this is applied only to EXEs and DLLs.
 config("sdk_link") {
   if (current_cpu == "x64") {
