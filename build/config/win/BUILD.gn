@@ -21,6 +21,10 @@ config("sdk") {
     # This is required for ATL to use XP-safe versions of its functions.
     "_USING_V110_SDK71_",
   ]
+
+  if (target_os == "winuwp") {
+    defines += [ "WINUWP" ]
+  }
 }
 
 # Sets the default Windows build version. This is separated because some
@@ -30,11 +34,6 @@ config("winver") {
     "_WIN32_WINNT=0x0603",
     "WINVER=0x0603",
   ]
-}
-
-# When OS target is WinUWP use WINUWP as the preprocessor flag to conditionalize.
-config("flutter_windows_winuwp_defs") {
-  defines = [ "WINUWP" ]
 }
 
 # Linker flags for Windows SDK setup, this is applied only to EXEs and DLLs.
