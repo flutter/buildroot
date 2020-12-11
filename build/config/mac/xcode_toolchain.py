@@ -4,19 +4,12 @@
 # found in the LICENSE file.
 
 import argparse
-import errno
 import sys
 import os
 import subprocess
 
-def mkdir_p(path):
-  try:
-    os.makedirs(path)
-  except OSError as exc:
-    if exc.errno == errno.EEXIST and os.path.isdir(path):
-      pass
-    else:
-      raise
+sys.path.insert(1, '../../build')
+from pyutil.file_util import symlink
 
 
 def main(argv):
@@ -30,10 +23,8 @@ def main(argv):
   assert os.path.exists(path)
 
   if args.symlink:
-    mkdir_p(args.symlink)
     symlink_target = os.path.join(args.symlink, os.path.basename(path))
-    if not os.path.exists(symlink_target):
-      os.symlink(path, symlink_target)
+    symlink(path, symlink_target)
     path = symlink_target
 
   print(path)

@@ -10,7 +10,6 @@ Usage:
   python find_sdk.py 10.6  # Ignores SDKs < 10.6
 """
 
-import errno
 import os
 import re
 import subprocess
@@ -18,15 +17,8 @@ import sys
 
 from optparse import OptionParser
 
-
-def mkdir_p(path):
-  try:
-    os.makedirs(path)
-  except OSError as exc:
-    if exc.errno == errno.EEXIST and os.path.isdir(path):
-      pass
-    else:
-      raise
+sys.path.insert(1, '../../build')
+from pyutil.file_util import symlink
 
 
 def parse_version(version_str):
@@ -92,10 +84,8 @@ def main():
     sdk_output = subprocess.check_output(['xcodebuild', '-version', '-sdk',
                                           'macosx' + best_sdk, 'Path']).strip()
     if options.symlink:
-      mkdir_p(options.symlink)
       symlink_target = os.path.join(options.symlink, os.path.basename(sdk_output))
-      if not os.path.exists(symlink_target):
-        os.symlink(sdk_output, symlink_target)
+      symlink(sdk_output, symlink_target)
       sdk_output = symlink_target
 
     if options.print_sdk_path:

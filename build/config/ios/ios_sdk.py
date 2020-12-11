@@ -8,18 +8,11 @@ import os
 import subprocess
 import sys
 
+sys.path.insert(1, '../../build')
+from pyutil.file_util import symlink
+
 # This script returns the path to the SDK of the given type. Pass the type of
 # SDK you want, which is typically 'iphone' or 'iphonesimulator'.
-
-def mkdir_p(path):
-  try:
-    os.makedirs(path)
-  except OSError as exc:
-    if exc.errno == errno.EEXIST and os.path.isdir(path):
-      pass
-    else:
-      raise
-
 
 def main(argv):
   parser = argparse.ArgumentParser()
@@ -40,10 +33,8 @@ def main(argv):
 
   sdk_output = subprocess.check_output(command).strip()
   if args.symlink:
-    mkdir_p(args.symlink)
     symlink_target = os.path.join(args.symlink, os.path.basename(sdk_output))
-    if not os.path.exists(symlink_target):
-      os.symlink(sdk_output, symlink_target)
+    symlink(sdk_output, symlink_target)
     sdk_output = symlink_target
 
   print(sdk_output)
