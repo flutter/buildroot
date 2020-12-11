@@ -5,6 +5,9 @@
 import errno
 import os
 
+"""Creates a directory and its parents (i.e. `mkdir -p`).
+
+If the directory already exists, does nothing."""
 def mkdir_p(path):
   try:
     os.makedirs(path)
@@ -15,6 +18,7 @@ def mkdir_p(path):
       raise
 
 
+"""Creates or ovewrites a symlink from `link` to `target`."""
 def symlink(target, link):
   mkdir_p(os.path.dirname(link))
   tmp_link = link + '.tmp'
