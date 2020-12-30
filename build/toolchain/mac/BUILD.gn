@@ -250,8 +250,22 @@ mac_toolchain("ios_clang_arm") {
   sysroot_flags = "-isysroot $ios_device_sdk_path -miphoneos-version-min=$ios_deployment_target"
 }
 
-# Toolchain used for iOS simulator targets.
-mac_toolchain("ios_clang_x64") {
+# Toolchain used for iOS simulator targets (arm64).
+mac_toolchain("ios_clang_arm_sim") {
+  toolchain_cpu = "arm"
+  toolchain_os = "mac"
+  # TODO(gw280): We have to use llvm from xcode until we upgrade our copy of llvm
+  ar = "ar"
+  cc = "clang"
+  cxx = "clang++"
+  ld = "clang++"
+  is_clang = true
+  # We have to ignore unknown options and range loop analysis as this isn't our expected toolchain
+  sysroot_flags = "-isysroot $ios_simulator_sdk_path -mios-simulator-version-min=$ios_deployment_target -Wno-unknown-warning-option -Wno-range-loop-analysis"
+}
+
+# Toolchain used for iOS simulator targets (x64).
+mac_toolchain("ios_clang_x64_sim") {
   toolchain_cpu = "x64"
   toolchain_os = "mac"
   prefix = rebase_path(llvm_bin_path, root_build_dir)
