@@ -36,7 +36,6 @@ source_set("libpng") {
       rebased_android_toolchain_root =
           rebase_path(android_toolchain_root, root_build_dir)
       asmflags = [
-        "-fno-integrated-as",
         "-B${rebased_android_toolchain_root}/bin",
       ]
     }
