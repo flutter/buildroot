@@ -25,7 +25,14 @@ if (current_toolchain == default_toolchain && target_sysroot != "") {
   sysroot = target_sysroot
 } else if (is_android) {
   import("//build/config/android/config.gni")
-  sysroot = rebase_path("$android_ndk_root/sysroot")
+  if (host_os == "mac") {
+    sysroot_platform = "darwin-x86_64"
+  } else if (host_os == "linux") {
+    sysroot_platform = "linux-x86_64"
+  } else {
+    assert(false)
+  }
+  sysroot = rebase_path("$android_ndk_root/toolchains/llvm/prebuilt/$sysroot_platform/sysroot")
 } else if (is_linux && !is_chromeos) {
   if (current_cpu == "mipsel") {
     sysroot = rebase_path("//mipsel-sysroot/sysroot")
