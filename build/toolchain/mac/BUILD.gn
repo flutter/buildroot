@@ -260,6 +260,8 @@ mac_toolchain("ios_clang_arm_sim") {
     cc = "$prefix/clang"
     cxx = "$prefix/clang++"
   } else {
+    # TODO: https://github.com/harfbuzz/harfbuzz/issues/2834
+    # harfbuzz has a non-fatal warning right now with Xcode 12
     ar = "ar"
     cc = "clang"
     cxx = "clang++"
