@@ -4,11 +4,13 @@
 # found in the LICENSE file.
 
 import os
+import shutil
+import subprocess
 import sys
 
 def clean(output_dir):
   if os.path.exists(output_dir):
-    os.remove(output_dir)
+        shutil.rmtree(output_dir, ignore_errors=True)
   return
 
 
@@ -19,10 +21,12 @@ def generate_headers(output_dir):
   
   cppwinrt_exe = os.path.join(
   __file__,
-  '..\\..\\third_party\\cppwinrt\\bin\\cppwinrt.exe')
+  '..\\..\\..\\third_party\\cppwinrt\\bin\\cppwinrt.exe')
 
   args = [cppwinrt_exe, '-in', 'sdk',
       '-out', '%s' % output_dir]
+
+  subprocess.check_output(args)
 
   return 0
 
@@ -30,9 +34,9 @@ def generate_headers(output_dir):
 def main(argv):
   generated_dir = os.path.join(
   __file__,
-  '..\\..\\third_party\\cppwinrt\\generated')
+  '..\\..\\..\\third_party\\cppwinrt\\generated')
   clean(generated_dir)
-  return generate_headers("generated")
+  return generate_headers(generated_dir)
 
 if __name__ == "__main__":
   sys.exit(main(sys.argv[1:]))
