@@ -108,6 +108,7 @@ config("default_libs") {
     # winspool) should include those explicitly.
     libs = [
       "advapi32.lib",
+      "bcrypt.lib",
       "comdlg32.lib",
       "delayimp.lib",
       "dnsapi.lib",
