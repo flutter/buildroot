@@ -21,7 +21,7 @@ declare_args() {
   bitcode_marker = false
 
   # Set this flag to strip .so files.
-  stripped_symbols = true
+  stripped_symbols = !is_debug
 }
 
 declare_args() {
