@@ -35,7 +35,7 @@ declare_args() {
   # The failure mode for this arises when a developer attempts to archive an application
   # for publication to the store with embedded bitcode.
   #
-  # Since we do not support publishing debug or release builds, we use 
+  # Since we do not support publishing debug or profile builds, we use 
   # bitcode_marker which is intrinsically faster to build and does not introduce
   # compatibility concerns between toolchains, meaning we can use
   # a GOMA enabled Clang.
