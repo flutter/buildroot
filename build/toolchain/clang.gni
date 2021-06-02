@@ -25,9 +25,7 @@ declare_args() {
 }
 
 declare_args() {
-  # Xcode is required if using bitcode, and Xcode builds cannot use goma.
-  # TODO(dnfield): We shouldn't need Xcode for bitcode_marker builds, but we do
-  # until libpng and dart have explicitly added LLVM asm sections to their
-  # assembly sources. https://github.com/flutter/flutter/issues/39281
-  use_xcode = enable_bitcode
+  # Xcode is required when doing builds that support bitcode for release.
+  # bitcode_marker is enabled in debug and profile, but disabled in release.
+  use_xcode = enable_bitcode && !bitcode_marker
 }
