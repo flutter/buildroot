@@ -119,7 +119,7 @@ android_gcc_toolchains_helper("x86") {
 android_gcc_toolchains_helper("arm") {
   android_ndk_lib_dir = arm_android_lib
 
-  tool_prefix = "$llvm_android_toolchain_root/bin/arm-linux-android-"
+  tool_prefix = "$llvm_android_toolchain_root/bin/arm-linux-androideabi-"
   toolchain_cpu = "arm"
 }
 
