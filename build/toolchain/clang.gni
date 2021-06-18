@@ -47,7 +47,7 @@ declare_args() {
   # TODO(gw280): Once our own copy of clang 12 is capable of building for arm64 simulator,
   # we can safely remove the requirement that we use xcode for arm64 simulator builds.
   if (is_mac || is_ios) {
-    use_xcode = (enable_bitcode && !bitcode_marker) || (use_ios_simulator && (target_cpu == "arm" || target_cpu == "arm64"))
+    use_xcode = (enable_bitcode && !bitcode_marker) || (use_ios_simulator && target_cpu == "arm64")
   } else {
     use_xcode = false
   }
