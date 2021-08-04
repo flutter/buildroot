@@ -65,7 +65,7 @@ def main():
   parser.add_option(
       '--jar-bin',
       default='jar',
-      help='The jar binary. It empty, the jar binary is resolved from PATH.')
+      help='The jar binary. If empty, the jar binary is resolved from PATH.')
 
   options, _ = parser.parse_args()
 

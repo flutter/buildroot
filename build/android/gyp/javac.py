@@ -200,12 +200,12 @@ def main(argv):
   parser.add_option(
       '--javac-bin',
       default='javac',
-      help='The javac binary. It empty, javac binary is resolved from PATH.')
+      help='The javac binary. If empty, the javac binary is resolved from PATH.')
 
   parser.add_option(
       '--jar-bin',
       default='jar',
-      help='The jar binary. It empty, the jar binary is resolved from PATH.')
+      help='The jar binary. If empty, the jar binary is resolved from PATH.')
 
   parser.add_option(
       '--java-version',
