@@ -214,33 +214,59 @@ config("compiler") {
         ]
       }
     } else if (current_cpu == "arm") {
-      cflags += [
-        "-march=$arm_arch",
-        "-mfloat-abi=$arm_float_abi",
-      ]
-      if (arm_tune != "") {
-        cflags += [ "-mtune=$arm_tune" ]
-      }
-      if (arm_use_thumb) {
-        cflags += [ "-mthumb" ]
-        if (is_android && !is_clang) {  # Clang doesn't support this option.
-          cflags += [ "-mthumb-interwork" ]
+      if (is_clang) {
+        if (arm_arch != "armv7-a") {
+          assert(false, "Any arm (32-bit) arch other than armv7-a is not supported by the bundled clang right now.")
         }
-      }
-      if (!is_clang) {
-        # Clang doesn't support these flags.
-        cflags += [
-          # The tree-sra optimization (scalar replacement for
-          # aggregates enabling subsequent optimizations) leads to
-          # invalid code generation when using the Android NDK's
-          # compiler (r5-r7). This can be verified using
-          # webkit_unit_tests' WTF.Checked_int8_t test.
-          "-fno-tree-sra",
+        if (arm_float_abi == "softfp" || arm_float_abi == "soft") {
+          assert(false, "ARM softfloat is not supported by the bundled clang right now.")
+        }
 
-          # The following option is disabled to improve binary
-          # size and performance in gcc 4.9.
-          "-fno-caller-saves",
+        # Any other target is not supported by the bundled clang right now.
+        # (the compiler-rt binaries inside srC/buildtools/linux-x64/clang/lib/clang/13.0.0/lib are not provided for anything else)
+        # If we specify something other than `armv7` (like `arm`, `armv7a`, `armv7-a`, `armv7l`) as the first part of the target triple,
+        # clang will attempt to load the compiler builtins (compiler-rt) from
+        #   `buildtools/linux-x64/clang/lib/clang/13.0.0/lib/linux/libclang_rt.builtins-armhf.a`
+        # instead of from
+        #   `buildtools/linux-x64/clang/lib/clang/13.0.0/lib/armv7-unknown-linux-gnueabihf/libclang_rt.builtins.a`,
+        # resulting in errors.
+        #
+        # You can use
+        #   `buildtools/linux-x64/clang/bin/clang++ --rtlib=compiler-rt --target=<target-triple> --print-libgcc-file-name`
+        # to print the compiler builtin location btw.
+        # (took me like a day to debug all this)
+
+        cflags += ["--target=armv7-linux-gnueabihf"]
+        ldflags += ["--target=armv7-linux-gnueabihf"]
+      } else {
+        cflags += [
+          "-march=$arm_arch",
+          "-mfloat-abi=$arm_float_abi",
         ]
+        if (arm_tune != "") {
+          cflags += [ "-mtune=$arm_tune" ]
+        }
+        if (arm_use_thumb) {
+          cflags += [ "-mthumb" ]
+          if (is_android && !is_clang) {  # Clang doesn't support this option.
+            cflags += [ "-mthumb-interwork" ]
+          }
+        }
+        if (!is_clang) {
+          # Clang doesn't support these flags.
+          cflags += [
+            # The tree-sra optimization (scalar replacement for
+            # aggregates enabling subsequent optimizations) leads to
+            # invalid code generation when using the Android NDK's
+            # compiler (r5-r7). This can be verified using
+            # webkit_unit_tests' WTF.Checked_int8_t test.
+            "-fno-tree-sra",
+
+            # The following option is disabled to improve binary
+            # size and performance in gcc 4.9.
+            "-fno-caller-saves",
+          ]
+        }
       }
     }
 

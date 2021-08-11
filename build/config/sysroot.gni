@@ -30,9 +30,14 @@ if (current_toolchain == default_toolchain && target_sysroot != "") {
   if (use_default_linux_sysroot && !is_fuchsia) {
     if (current_cpu == "x64") {
       sysroot = rebase_path("//build/linux/debian_sid_amd64-sysroot")
-    } else {
+    } else if (current_cpu == "arm64") {
       sysroot = rebase_path("//build/linux/debian_sid_arm64-sysroot")
+    } else if (current_cpu == "arm") {
+      sysroot = rebase_path("//build/linux/debian_sid_arm-sysroot")
+    } else {
+      assert(false, "Unknown CPU: $current_cpu.")
     }
+
     assert(
         exec_script("//build/dir_exists.py", [ sysroot ], "string") == "True",
         "Missing sysroot ($sysroot). To fix, run: build/linux/sysroot_scripts/install-sysroot.py --arch=$current_cpu")
