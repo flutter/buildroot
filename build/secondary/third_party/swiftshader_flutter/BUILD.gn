@@ -39,6 +39,7 @@ config("internal_config") {
     ]
   } else {
     cflags = [
+      "-fPIC",
       "-Wno-header-hygiene",
       "-Wno-newline-eof",
       "-Wno-nonportable-include-path",
