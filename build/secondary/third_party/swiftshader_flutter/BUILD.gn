@@ -1213,8 +1213,10 @@ config("spvtools_internal_config") {
 
   if (is_clang) {
     cflags = [
+      "-Wno-deprecated-declarations",
       "-Wno-implicit-fallthrough",
       "-Wno-newline-eof",
+      "-Wno-range-loop-construct",
     ]
   }
 }
