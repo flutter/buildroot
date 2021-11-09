@@ -43,6 +43,7 @@ config("internal_config") {
       "-Wno-header-hygiene",
       "-Wno-newline-eof",
       "-Wno-nonportable-include-path",
+      "-Wno-range-loop-construct",
       "-Wno-thread-safety-analysis",
       "-Wno-undefined-var-template",
       "-Wno-unneeded-internal-declaration",
