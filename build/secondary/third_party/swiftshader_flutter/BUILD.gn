@@ -883,7 +883,6 @@ shared_library("vulkan") {
   public = []
 
   sources = [
-    "$source_root/src/Common/SharedLibrary.cpp",
     "$source_root/src/Vulkan/VkBuffer.cpp",
     "$source_root/src/Vulkan/VkBufferView.cpp",
     "$source_root/src/Vulkan/VkCommandBuffer.cpp",
