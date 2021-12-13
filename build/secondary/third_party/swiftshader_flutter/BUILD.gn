@@ -49,6 +49,7 @@ config("internal_config") {
       "-Wno-unneeded-internal-declaration",
       "-Wno-c++17-extensions",
       "-Wno-unused-variable",
+      "-Wno-deprecated-declarations",
     ]
   }
 
