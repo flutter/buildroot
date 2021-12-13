@@ -338,6 +338,7 @@ source_set("wsi") {
       "$source_root/src/WSI/XcbSurfaceKHR.cpp",
       "$source_root/src/WSI/XlibSurfaceKHR.cpp",
       "$source_root/src/WSI/libX11.cpp",
+      "$source_root/src/WSI/libXCB.cpp",
     ]
   }
 
