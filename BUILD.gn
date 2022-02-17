@@ -5,23 +5,31 @@
 # This target will be built if no target is specified when invoking ninja.
 group("default") {
   testonly = true
-  deps = [
-    "//flutter",
-  ]
+  if (target_os == "wasm") {
+    deps = [
+      "//third_party/skia/modules/canvaskit:canvaskit"
+    ]
+  } else {
+    deps = [
+      "//flutter",
+    ]
+  }
 }
 
-group("dist") {
-  testonly = true
+if (target_os != "wasm") {
+  group("dist") {
+    testonly = true
 
-  deps = [
-    "//flutter:dist",
-  ]
-}
+    deps = [
+      "//flutter:dist",
+    ]
+  }
 
-group("archives") {
-  testonly = true
+  group("archives") {
+    testonly = true
 
-  deps = [
-    "//flutter/build/archives:artifacts"
-  ]
+    deps = [
+      "//flutter/build/archives:artifacts"
+    ]
+  }
 }
