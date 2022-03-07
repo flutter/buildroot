@@ -30,8 +30,6 @@ group("dist") {
   }
 } else {
   group("default") {
-    testonly = true
-
     deps = [
       "//flutter/lib/web_ui:canvaskit"
     ]
