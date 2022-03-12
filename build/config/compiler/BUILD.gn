@@ -354,6 +354,13 @@ config("compiler") {
     }
   }
 
+  # Fuchsia-specific compiler flags setup.
+  if (is_fuchsia) {
+    # The embedder requires position-independent code to compile.
+    cflags += [ "-fPIC" ]
+    ldflags += [ "-fPIC" ]
+  }
+
   # Clang-specific compiler flags setup.
   # ------------------------------------
   if (is_clang) {
