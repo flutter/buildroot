@@ -10,7 +10,6 @@ declare_args() {
 }
 
 wasm_toolchain = "//build/toolchain/wasm"
-is_wasm = target_cpu == "wasm"
 
 em_config_path = "$emsdk_dir/.emscripten"
 
