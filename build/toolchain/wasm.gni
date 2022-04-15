@@ -64,8 +64,8 @@ template("wasm_lib") {
   }
 
   group("$_lib_name") {
-    deps = [
-      ":${_lib_name}.js($wasm_toolchain)",
+    public_deps = [
+      ":${_lib_name}.js",
     ]
   }
 }
