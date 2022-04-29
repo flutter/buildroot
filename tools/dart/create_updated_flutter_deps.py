@@ -17,6 +17,7 @@ import sys
 DART_SCRIPT_DIR = os.path.dirname(sys.argv[0])
 DART_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../third_party/dart'))
 FLUTTER_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../flutter'))
+MONOREPO_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../../monorepo'))
 
 class VarImpl(object):
   def __init__(self, local_scope):
@@ -61,12 +62,29 @@ def ParseArgs(args):
       type=str,
       help='Flutter DEPS file.',
       default=os.path.join(FLUTTER_ROOT, 'DEPS'))
+  parser.add_argument('--monorepo_deps', '-m',
+      type=str,
+      help='Monorepo DEPS file.',
+      default=os.path.join(MONOREPO_ROOT, 'DEPS'))
+  parser.add_argument('--create_monorepo',
+                      action='store_true',
+                      help='Create monorepo DEPS file')
+  parser.add_argument('--dart_commit',
+                      type=str,
+                      help='Set monorepo DEPS to check out this Dart commit.')
+  parser.add_argument('--engine_commit',
+                      type=str,
+                      help='Set monorepo DEPS to check out this engine commit.')
+  parser.add_argument('--flutter_commit',
+                      type=str,
+                      help='Set monorepo DEPS to check out this flutter commit.')
   return parser.parse_args(args)
 
 def Main(argv):
   args = ParseArgs(argv)
   (new_vars, new_deps) = ParseDepsFile(args.dart_deps)
   (old_vars, old_deps) = ParseDepsFile(args.flutter_deps)
+  output_file = args.monorepo_deps if args.create_monorepo else args.flutter_deps
 
   updated_vars = {}
 
@@ -79,14 +97,24 @@ def Main(argv):
         updated_vars[k] = updated_revision
 
   # Write updated DEPS file to a side
-  updatedfilename = args.flutter_deps + ".new"
+  updatedfilename = output_file + ".new"
   updatedfile = open(updatedfilename, "w")
   file = open(args.flutter_deps)
   lines = file.readlines()
   i = 0
+
+  create_monorepo = args.create_monorepo
+  # Track status of all rewrites
+  vars_updated = False
+  sdk_download = False
+  dart_pin = False
+  pinned_monorepo_deps = False
+  updated_dependencies = False
+
   while i < len(lines):
     updatedfile.write(lines[i])
     if lines[i].startswith("  'dart_revision':"):
+      vars_updated = True
       i = i + 2
       updatedfile.writelines([
         '\n',
@@ -98,7 +126,36 @@ def Main(argv):
         updatedfile.write("  '%s': '%s',\n" % (k, v))
       updatedfile.write('\n')
 
+    elif (create_monorepo
+       and lines[i].startswith('  # Download a prebuilt Dart SDK by default')
+       and lines[i+1].startswith("  'download_dart_sdk': True,")):
+        sdk_download = True
+        updatedfile.write("  'download_dart_sdk': False,\n")
+        i = i + 1
+
+    elif (create_monorepo
+          and lines[i].startswith('deps = {')
+          and lines[i+1].startswith(
+          "  'src': 'https://github.com/flutter/buildroot.git' + '@' + ")):
+        pinned_monorepo_deps = True
+        i = i + 1
+        updatedfile.write(lines[i])
+        for dependency in [('src/flutter', 'flutter_git', '/mirrors/engine', args.engine_commit),
+                           ('src/third_party/dart', 'dart_git', '/sdk', args.dart_commit),
+                           ('flutter', 'flutter_git', '/mirrors/flutter', args.flutter_commit),
+                           ]:
+          updatedfile.write("\n  '%s': Var('%s') + '%s' + '@' + '%s',\n" % dependency)
+
+    elif ( create_monorepo
+           and i < len(lines) - 3
+          and lines[i] == '\n'
+          and lines[i+1] == "  'src/third_party/dart':\n"
+          and lines[i+2] == "   Var('dart_git') + '/sdk.git' + '@' + Var('dart_revision'),\n"):
+      dart_pin = True
+      i = i + 3
+
     elif lines[i].startswith("  # WARNING: Unused Dart dependencies"):
+      updated_dependencies = True
       updatedfile.write('\n')
       i = i + 1
       while i < len(lines) and (lines[i].startswith("  # WARNING: end of dart dependencies") == 0):
@@ -133,9 +190,25 @@ def Main(argv):
     i = i + 1
 
   # Rename updated DEPS file into a new DEPS file
-  os.remove(args.flutter_deps)
-  os.rename(updatedfilename, args.flutter_deps)
+  os.remove(output_file)
+  os.rename(updatedfilename, output_file)
 
+  if create_monorepo and not (vars_updated and
+      sdk_download and
+      dart_pin and
+      pinned_monorepo_deps and
+      updated_dependencies ):
+    if not vars_updated:
+      print("Could not find 'dart_revision' line.")
+    if not sdk_download:
+      print("Could not set download_dart_sdk to False.")
+    if not dart_pin:
+      print("Could not remove 'src/third_party/dart' dependency line.")
+    if not pinned_monorepo_deps:
+      print("Could not add flutter, engine, and dart dependencies.")
+    if not updated_dependencies:
+      print("Could not update third_party dependencies.")
+    return 1
   return 0
 
 if __name__ == '__main__':
