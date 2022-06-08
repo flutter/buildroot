@@ -9,6 +9,8 @@ import("//build/toolchain/toolchain.gni")
 # dependencies.
 angle_root = "//third_party/angle"
 
+angle_vma_version = 30000001
+
 # Flutter's buildroot looks enough like Chromium to satisfy Angle, and enough
 # to cause GN variable collisions if we don't set this.
 angle_has_build = true
