@@ -288,7 +288,9 @@ if (target_cpu == "arm64") {
   win_toolchains("arm64") {
     toolchain_arch = "arm64"
   }
-  win_toolchains(host_cpu) {
-    toolchain_arch = host_cpu
+  if (host_cpu != "arm64") {
+    win_toolchains(host_cpu) {
+        toolchain_arch = host_cpu
+    }
   }
 }
