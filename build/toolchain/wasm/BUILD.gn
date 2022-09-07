@@ -26,17 +26,14 @@ gcc_toolchain("wasm") {
   readelf = "readelf"
   nm = "nm"
 
+  is_clang = true
+
   toolchain_cpu = "wasm"
   toolchain_os = "wasm"
 
   link_outputs = [ "{{root_out_dir}}/{{target_output_name}}.wasm" ]
 
-  toolchain_args = {
-    is_clang = true
-    target_os = target_os
-    target_cpu = target_cpu
-    current_cpu = toolchain_cpu
-    current_os = toolchain_os
+  extra_toolchain_args = {
     skia_use_angle = false
     skia_use_dng_sdk = false
     skia_use_dawn = false
