@@ -17,7 +17,10 @@ if (use_goma) {
   compiler_prefix = ""
 }
 
-gcc_toolchain("wasm") {
+# This toolchain is specifically for building CanvasKit.
+#
+# It overrides many Skia args in order to facilitate building CanvasKit.
+gcc_toolchain("wasm_for_canvaskit") {
   # emsdk_dir and em_config are defined in wasm.gni.
   ar = "$compiler_prefix$emsdk_dir/upstream/emscripten/emar --em-config $em_config_path"
   cc = "$compiler_prefix$emsdk_dir/upstream/emscripten/emcc --em-config $em_config_path"
