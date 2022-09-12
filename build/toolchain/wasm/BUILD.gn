@@ -37,6 +37,7 @@ gcc_toolchain("wasm_for_canvaskit") {
   link_outputs = [ "{{root_out_dir}}/{{target_output_name}}.wasm" ]
 
   extra_toolchain_args = {
+    skia_use_vulkan = false
     skia_use_webgpu = false
     skia_use_libheif = false
     skia_use_libjpeg_turbo_decode = true
@@ -48,6 +49,7 @@ gcc_toolchain("wasm_for_canvaskit") {
     skia_use_lua = false
     skia_use_wuffs = true
     skia_use_zlib = true
+    skia_gl_standard = "webgl"
     skia_enable_gpu = true
     skia_enable_sksl_tracing = false
     skia_use_icu = true
