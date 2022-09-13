@@ -6,7 +6,7 @@ group("default") {
   testonly = true
   if (target_os == "wasm") {
     deps = [
-      "//flutter/wasm:wasm_artifacts"
+      "//flutter/wasm"
     ]
   } else {
     deps = [
@@ -20,7 +20,7 @@ group("dist") {
 
   if (target_os == "wasm") {
     deps = [
-      "//flutter/wasm:wasm_artifacts"
+      "//flutter/wasm"
     ]
   } else {
     deps = [
