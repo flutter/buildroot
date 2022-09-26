@@ -5,13 +5,14 @@
 source_root = "//third_party/tinygltf"
 
 source_set("tinygltf") {
-  public = [
-    "$source_root/tiny_gltf.h",
+  public = [ "$source_root/tiny_gltf.h" ]
+
+  include_dirs = [
+    "$source_root",
+    "$source_root/third_party/include",
   ]
 
-  include_dirs = [ "$source_root" ]
+  sources = [ "$source_root/tiny_gltf.cc" ]
 
-  sources = [
-    "$source_root/tiny_gltf.cc",
-  ]
+  public_deps = [ "//third_party/json" ]
 }

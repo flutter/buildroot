@@ -5,10 +5,7 @@
 source_root = "//third_party/inja"
 
 config("inja_public_config") {
-  include_dirs = [
-    "$source_root/include",
-    "$source_root/third_party/include",
-  ]
+  include_dirs = [ "$source_root/include" ]
 
   if (is_clang) {
     cflags_cc = [
