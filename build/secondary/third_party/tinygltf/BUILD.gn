@@ -12,7 +12,7 @@ source_set("tinygltf") {
     "$source_root/third_party/include",
   ]
 
-  sources = [ "$source_root/tiny_gltf.cc" ]
+  sources = [ "//build/secondary/third_party/tinygltf/tinygltf_stub.cc" ]
 
-  public_deps = [ "//third_party/json" ]
+  deps = [ "//third_party/json" ]
 }
