@@ -62,6 +62,8 @@ source_set("glfw") {
       "$_checkout_dir/src/linux_joystick.c",
       "$_checkout_dir/src/linux_joystick.h",
       "$_checkout_dir/src/posix_module.c",
+      "$_checkout_dir/src/posix_poll.c",
+      "$_checkout_dir/src/posix_poll.h",
       "$_checkout_dir/src/posix_thread.c",
       "$_checkout_dir/src/posix_thread.h",
       "$_checkout_dir/src/posix_time.c",
