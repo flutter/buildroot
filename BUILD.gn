@@ -6,7 +6,8 @@ group("default") {
   testonly = true
   if (target_os == "wasm") {
     deps = [
-      "//flutter/wasm"
+      "//flutter/wasm",
+      "//flutter/third_party/canvaskit",
     ]
   } else {
     deps = [
