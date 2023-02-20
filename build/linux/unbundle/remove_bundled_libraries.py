@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-#
-# Copyright 2013 The Chromium Authors. All rights reserved.
+# Copyright 2013 The Chromium Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -9,7 +8,6 @@ Removes bundled libraries to make sure they are not used.
 
 See README for more details.
 """
-
 
 import optparse
 import os.path
@@ -22,8 +20,8 @@ def DoMain(argv):
     os.path.join(my_dirname, '..', '..', '..'))
 
   if os.path.join(source_tree_root, 'build', 'linux', 'unbundle') != my_dirname:
-    print(('Sanity check failed: please run this script from ' +
-           'build/linux/unbundle directory.'))
+    print('Sanity check failed: please run this script from '
+          'build/linux/unbundle directory.')
     return 1
 
   parser = optparse.OptionParser()
@@ -69,6 +67,10 @@ def DoMain(argv):
       if f.endswith('.gyp') or f.endswith('.gypi'):
         continue
 
+      # Same about GN files.
+      if f.endswith('.gn') or f.endswith('.gni'):
+        continue
+
       # Deleting .isolate files leads to gyp failures. They are usually
       # not used by a distro build anyway.
       # See http://www.chromium.org/developers/testing/isolated-testing
@@ -93,8 +95,8 @@ def DoMain(argv):
       exit_code = 1
 
   if not options.do_remove:
-    print(('To actually remove files printed above, please pass ' +
-           '--do-remove flag.'))
+    print('To actually remove files printed above, please pass '
+          '--do-remove flag.')
 
   return exit_code
 

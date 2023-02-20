@@ -1,0 +1,20 @@
+# Copyright 2013 The Flutter Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/linux/pkg_config.gni")
+import("//build/shim_headers.gni")
+
+pkg_config("system_sqlite") {
+  packages = [ "sqlite3" ]
+}
+
+shim_headers("sqlite_shim") {
+  root_path = "."
+  headers = [ "sqlite3.h" ]
+}
+
+source_set("sqlite") {
+  public_deps = [ ":sqlite_shim" ]
+  public_configs = [ ":system_sqlite" ]
+}
