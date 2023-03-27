@@ -4,7 +4,6 @@
 
 source_set("fontconfig") {
   if (is_linux) {
-    public_configs = [ "//third_party/fontconfig:fontconfig_config" ]
-    deps = [ "//third_party/fontconfig" ]
+    libs = [ "fontconfig" ]
   }
 }
