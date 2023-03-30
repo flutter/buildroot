@@ -874,7 +874,7 @@ config("optimize") {
   } else if (is_android || is_fuchsia) {
     cflags = [ "-Oz" ] + common_optimize_on_cflags  # Favor size over speed.
   } else if (is_wasm) {
-    cflags = [ "-O3" ]
+    cflags = [ "-O3", "-sINLINING_LIMIT" ]
   } else {
     cflags = [ "-O2" ] + common_optimize_on_cflags
   }
