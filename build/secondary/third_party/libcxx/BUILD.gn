@@ -2,9 +2,16 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/config/linux/libc.gni")
+
 config("libcxx_config") {
   defines = [ "_LIBCPP_DISABLE_AVAILABILITY=1" ]
   include_dirs = [ "//build/secondary/third_party/libcxx/config" ]
+
+  if (is_musl) {
+    # musl does not have a macro indicating that it is musl
+    defines += [ "_LIBCPP_HAS_MUSL_LIBC" ]
+  }
 }
 
 config("src_include") {
