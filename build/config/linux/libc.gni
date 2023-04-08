@@ -1,0 +1,56 @@
+# Copyright (c) 2013 The Flutter Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/sysroot.gni")
+
+assert(is_linux)
+
+declare_args() {
+  # The C library used by the compilation host.
+  # If using sysroot, this is the sysroot's libc rather than host's
+  # Expecting one of: "gnu" (glibc), "musl", or "" (autodetect)
+  host_libc = ""
+
+  # The C library of the compilation target.
+  # Expecting one of: "gnu" (glibc), "musl", or "" (same as host)
+  target_libc = ""
+}
+
+# try to detect host's libc if not explicitly provided
+if (host_libc == "" && is_linux) {
+  if (sysroot == "") {
+    host_compiler = "gcc"
+    if (is_clang) {
+      host_compiler = "clang"
+    }
+
+    # tries to determine libc from "gcc -printmachine"
+    host_libc = exec_script("//build/config/linux/detect_host_libc.py",
+                            [
+                              "--compiler-path",
+                              host_compiler,
+                            ],
+                            "string")
+  } else {
+  	# only glibc sysroots are provided by flutter. assume glibc,
+  	# set `host_libc` explicitly if this is wrong.
+    host_libc = "gnu"
+  }
+}
+
+assert(!is_linux || host_libc != "", "Host libc not specified and not detected")
+
+# assume compiling for host if not explicitly specified
+if (target_libc == "") {
+  target_libc = host_libc
+}
+
+is_glibc = target_libc == "gnu"
+is_musl = target_libc == "musl"
+
+is_host_glibc = host_libc == "gnu"
+is_host_musl = host_libc == "musl"
+
+assert(is_host_glibc || is_host_musl, "Unknown host libc: $host_libc")
+assert(is_glibc || is_musl, "Unknown target libc: $target_libc")

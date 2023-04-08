@@ -13,6 +13,9 @@ if (is_posix) {
 if (is_win) {
   import("//build/config/win/visual_studio_version.gni")
 }
+if (is_linux) {
+  import("//build/config/linux/libc.gni")
+}
 
 import("//build/config/c++/c++.gni")
 import("//build/config/profiler.gni")
@@ -345,8 +348,12 @@ config("compiler") {
     ldflags += [ "-pthread" ]
 
     if (current_cpu == "arm64") {
-      cflags += [ "--target=aarch64-linux-gnu" ]
-      ldflags += [ "--target=aarch64-linux-gnu" ]
+      _triple = custom_target_triple
+      if (_triple == "") {
+      	_triple = "aarch64-linux-$target_libc"
+      }
+      cflags += [ "--target=$_triple" ]
+      ldflags += [ "--target=$_triple" ]
       cflags += [ "-DBORINGSSL_CLANG_SUPPORTS_DOT_ARCH" ]
     }
   }
@@ -638,6 +645,9 @@ if (is_win) {
     "-Wno-missing-field-initializers",  # "struct foo f = {0};"
     "-Wno-unused-parameter",  # Unused function parameters.
   ]
+  if (is_linux && is_musl) {
+    default_warning_flags += [ "-Wno-sign-compare" ]
+  }
 
   if (is_wasm) {
     default_warning_flags += [
