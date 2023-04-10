@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/config/android/config.gni")
+import("//build/toolchain/wasm.gni")
 if (current_cpu == "arm") {
   import("//build/config/arm.gni")
 }
@@ -272,6 +273,10 @@ config("compiler") {
   }
 
   if (is_wasm) {
+    if (wasm_use_pthreads) {
+      cflags += [ "-pthread" ]
+      ldflags += [ "-pthread" ]
+    }
     ldflags += [
       "-s",
       "WASM=1",
@@ -908,11 +913,6 @@ config("no_optimize") {
       cflags += [ "-fomit-frame-pointer" ]
     }
     ldflags = common_optimize_on_ldflags
-  } else if (is_wasm) {
-    cflags = [
-      "-O0",
-      "-gsource-map",
-    ]
   } else {
     cflags = [ "-O0" ]
   }
@@ -950,6 +950,14 @@ config("symbols") {
       cflags = [ "/Zi" ]  # Produce PDB file, no edit and continue.
     }
     ldflags = [ "/DEBUG" ]
+  } else if (is_wasm) {
+    if (wasm_use_dwarf) {
+      cflags = [ "-g3" ]
+      ldflags = [ "-g3" ]
+    } else {
+      cflags = [ "-gsource-map" ]
+      ldflags = [ "-gsource-map"]
+    }
   } else {
     cflags = [ "-g2" ]
   }
