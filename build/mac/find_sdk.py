@@ -19,7 +19,7 @@ import sys
 
 from optparse import OptionParser
 
-sys.path.insert(1, '../../build')
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from pyutil.file_util import symlink
 
 
