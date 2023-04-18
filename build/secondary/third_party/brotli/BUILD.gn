@@ -1,0 +1,26 @@
+# Copyright 2023 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+source_root = "//third_party/brotli"
+
+config("brotli_config") {
+  include_dirs = [ "$source_root/c/include" ]
+}
+
+source_set("brotli") {
+  sources = [
+    "$source_root/c/common/constants.c",
+    "$source_root/c/common/context.c",
+    "$source_root/c/common/dictionary.c",
+    "$source_root/c/common/platform.c",
+    "$source_root/c/common/shared_dictionary.c",
+    "$source_root/c/common/transform.c",
+    "$source_root/c/dec/bit_reader.c",
+    "$source_root/c/dec/decode.c",
+    "$source_root/c/dec/huffman.c",
+    "$source_root/c/dec/state.c",
+  ]
+
+  public_configs = [ ":brotli_config" ]
+}
