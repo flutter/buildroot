@@ -418,12 +418,12 @@ def _CopyDebugger(target_dir, target_cpu):
     _CopyRuntimeImpl(target_path, full_path)
 
 
-def _GetDesiredVsToolchainHashes():
+def _GetDesiredVsToolchainHashes(toolchain):
   """Load a list of SHA1s corresponding to the toolchains that we want installed
   to build with."""
-  # VS 2019 16.61 with 10.0.20348.0 SDK, 10.0.19041 version of Debuggers
-  # with ARM64 libraries and UWP support.
-  toolchain_hash = '1023ce2e82'
+  # VS 2022 17.4 with 10.0.22621.0 SDK with ARM64 libraries and UWP support.
+  # https://source.chromium.org/chromium/chromium/src/+/d95ceb643ec4a6573e0cbef9a90f39e1c3aadc66:build/vs_toolchain.py;l=40
+  toolchain_hash = '27370823e7'
   # Third parties that do not have access to the canonical toolchain can map
   # canonical toolchain version to their own toolchain versions.
   toolchain_hash_mapping_key = 'GYP_MSVS_HASH_%s' % toolchain_hash
