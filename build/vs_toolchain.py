@@ -418,7 +418,7 @@ def _CopyDebugger(target_dir, target_cpu):
     _CopyRuntimeImpl(target_path, full_path)
 
 
-def _GetDesiredVsToolchainHashes(toolchain):
+def _GetDesiredVsToolchainHashes():
   """Load a list of SHA1s corresponding to the toolchains that we want installed
   to build with."""
   # VS 2022 17.4 with 10.0.22621.0 SDK with ARM64 libraries and UWP support.
