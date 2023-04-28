@@ -244,11 +244,8 @@ template("fuchsia_sdk") {
   foreach(part, meta_json.parts) {
     part_meta_json = {
     }
-
     part_meta = part.meta
     part_meta_rebased = "$_fuchsia_sdk_path/$part_meta"
-
-    part_meta_json = read_file(part_meta_rebased, "json")
 
     # Check if the part is using `part.element_type` or `part.type`.
     part_type = ""
@@ -261,6 +258,7 @@ template("fuchsia_sdk") {
     # Check if the part type is in `invoker.enabled_parts`.
     if (invoker.enabled_parts + [ part_type ] - [ part_type ] !=
         invoker.enabled_parts) {
+      part_meta_json = read_file(part_meta_rebased, "json")
       subtarget_name = part_meta_json.name
 
       if (part_type == "cc_source_library") {
