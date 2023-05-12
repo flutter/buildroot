@@ -62,6 +62,11 @@ def GeneratorMain(argv):
         header_filename = header_spec
         include_before = ''
         include_after = ''
+      if '%' in header_filename:
+        (header_filename,
+         upstream_header_filename) = header_filename.split('%', 1)
+      else:
+        upstream_header_filename = header_filename
       if options.outputs:
         yield os.path.join(target_directory, header_filename)
       if options.generate:
@@ -85,7 +90,7 @@ def GeneratorMain(argv):
             for header in include_before.split(':'):
               f.write('#include %s\n' % header)
 
-          include_target = options.prefix + header_filename
+          include_target = options.prefix + upstream_header_filename
           if options.use_include_next:
             f.write('#include_next <%s>\n' % include_target)
           else:

@@ -5,13 +5,18 @@
 import("//build/shim_headers.gni")
 
 declare_args() {
-  # this allows to use zlib-ng instead of original zlib
-  zlib_name = "z"
+  use_zlib_ng = false
+}
+
+if (use_zlib_ng) {
+  _suffix = "-ng"
+} else {
+  _suffix = ""
 }
 
 shim_headers("zlib_shim") {
   root_path = "."
-  headers = [ "zlib.h" ]
+  headers = [ "zlib.h%zlib$_suffix.h" ]
   additional_includes = [ "third_party" ]
 }
 
@@ -25,7 +30,7 @@ config("zlib_config") {
 
 source_set("zlib") {
   public_deps = [ ":zlib_shim" ]
-  libs = [ zlib_name ]
+  libs = [ "z$_suffix" ]
   public_configs = [ ":system_zlib" ]
 }
 
