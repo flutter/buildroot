@@ -1,0 +1,142 @@
+# Copyright 2013 The Flutter Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/linux/pkg_config.gni")
+import("//build/shim_headers.gni")
+
+shim_headers("freetype_shim") {
+  root_path = "include"
+
+  # find . -type f | while read line; do echo '    "'"$line"'",'; done | wl-copy
+  headers = [
+    "./ftparams.h",
+    "./ftsnames.h",
+    "./ftmac.h",
+    "./ftimage.h",
+    "./ftcache.h",
+    "./ftgzip.h",
+    "./config/ftconfig.h",
+    "./config/ftheader.h",
+    "./config/public-macros.h",
+    "./config/integer-types.h",
+    "./config/mac-support.h",
+    "./config/ftmodule.h",
+    "./config/ftstdlib.h",
+    "./config/ftoption.h",
+    "./ftmodapi.h",
+    "./internal/fthash.h",
+    "./internal/pshints.h",
+    "./internal/svginterface.h",
+    "./internal/tttypes.h",
+    "./internal/ftcalc.h",
+    "./internal/ftobjs.h",
+    "./internal/ftdrv.h",
+    "./internal/t1types.h",
+    "./internal/fttrace.h",
+    "./internal/ftrfork.h",
+    "./internal/wofftypes.h",
+    "./internal/sfnt.h",
+    "./internal/cfftypes.h",
+    "./internal/psaux.h",
+    "./internal/autohint.h",
+    "./internal/cffotypes.h",
+    "./internal/ftserv.h",
+    "./internal/services/svprop.h",
+    "./internal/services/svbdf.h",
+    "./internal/services/svttglyf.h",
+    "./internal/services/svfntfmt.h",
+    "./internal/services/svsfnt.h",
+    "./internal/services/svttcmap.h",
+    "./internal/services/svotval.h",
+    "./internal/services/svcfftl.h",
+    "./internal/services/svgxval.h",
+    "./internal/services/svpfr.h",
+    "./internal/services/svmetric.h",
+    "./internal/services/svpsinfo.h",
+    "./internal/services/svwinfnt.h",
+    "./internal/services/svkern.h",
+    "./internal/services/svpscmap.h",
+    "./internal/services/svpostnm.h",
+    "./internal/services/svcid.h",
+    "./internal/services/svgldict.h",
+    "./internal/services/svmm.h",
+    "./internal/services/svtteng.h",
+    "./internal/compiler-macros.h",
+    "./internal/ftstream.h",
+    "./internal/ftmemory.h",
+    "./internal/ftpsprop.h",
+    "./internal/ftgloadr.h",
+    "./internal/ftdebug.h",
+    "./internal/ftvalid.h",
+    "./ftmoderr.h",
+    "./ftcolor.h",
+    "./ftbbox.h",
+    "./fterrors.h",
+    "./tttables.h",
+    "./ftwinfnt.h",
+    "./ftincrem.h",
+    "./ftlzw.h",
+    "./ftmm.h",
+    "./ftadvanc.h",
+    "./ftstroke.h",
+    "./ftcid.h",
+    "./ftdriver.h",
+    "./ftlogging.h",
+    "./ftsystem.h",
+    "./ftlist.h",
+    "./t1tables.h",
+    "./ttnameid.h",
+    "./freetype.h",
+    "./ftgasp.h",
+    "./ftbdf.h",
+    "./ftbitmap.h",
+    "./ftotval.h",
+    "./otsvg.h",
+    "./fttypes.h",
+    "./ftpfr.h",
+    "./ftbzip2.h",
+    "./ftfntfmt.h",
+    "./ftglyph.h",
+    "./fterrdef.h",
+    "./ftsynth.h",
+    "./ftlcdfil.h",
+    "./ftoutln.h",
+    "./ftsizes.h",
+    "./ftrender.h",
+    "./ftchapters.h",
+    "./fttrigon.h",
+    "./ftgxval.h",
+    "./tttags.h",
+  ]
+}
+
+config("freetype_config") {
+  include_dirs = [ "include/freetype-flutter-config" ]
+
+  cflags = []
+
+  if (is_clang) {
+    cflags += [
+      "-Wno-unused-function",
+      "-Wno-unused-variable",
+    ]
+  }
+}
+
+pkg_config("system_freetype2") {
+  packages = [ "freetype2" ]
+}
+
+source_set("freetype2") {
+  output_name = "freetype2"
+  public_deps = [ ":freetype_shim" ]
+  deps = [
+    "//third_party/libpng",
+    "//third_party/zlib",
+  ]
+  public_configs = [
+    ":freetype_config",
+    ":system_freetype2",
+  ]
+}

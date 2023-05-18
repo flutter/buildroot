@@ -36,7 +36,7 @@ REPLACEMENTS = {
   'absl_utility': 'third_party/abseil-cpp/absl/utility/BUILD.gn',
   #
   'fontconfig': 'third_party/fontconfig/BUILD.gn',
-  'freetype': 'third_party/freetype2/BUILD.gn',
+  'freetype2': 'third_party/freetype2/BUILD.gn',
   'harfbuzz': 'third_party/harfbuzz/BUILD.gn',
   'icu': 'third_party/icu/BUILD.gn',
   'libpng': 'third_party/libpng/BUILD.gn',
