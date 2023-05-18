@@ -1,0 +1,31 @@
+# Copyright 2013 The Flutter Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/linux/pkg_config.gni")
+
+pkg_config("system_harfbuzz") {
+  packages = [ "harfbuzz" ]
+}
+
+pkg_config("system_harfbuzz_subset") {
+  packages = [ "harfbuzz-subset" ]
+}
+
+source_set("harfbuzz") {
+  output_name = "harfbuzz"
+  deps = [
+    "//third_party/freetype2",
+    "//third_party/icu:icuuc",
+  ]
+  public_configs = [ ":system_harfbuzz" ]
+}
+
+source_set("harfbuzz_subset") {
+  output_name = "harfbuzz_subset"
+  deps = [
+    "//third_party/freetype2",
+    "//third_party/icu:icuuc",
+  ]
+  public_configs = [ ":system_harfbuzz_subset" ]
+}
