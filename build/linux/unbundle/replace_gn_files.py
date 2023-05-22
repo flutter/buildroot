@@ -39,6 +39,7 @@ REPLACEMENTS = {
   'freetype2': 'third_party/freetype2/BUILD.gn',
   'harfbuzz': 'third_party/harfbuzz/BUILD.gn',
   'icu': 'third_party/icu/BUILD.gn',
+  'libjpeg-turbo': 'third_party/libjpeg-turbo/BUILD.gn',
   'libpng': 'third_party/libpng/BUILD.gn',
   'libwebp': 'build/secondary/third_party/libwebp/BUILD.gn',
   'libxml': 'third_party/libxml/BUILD.gn',
