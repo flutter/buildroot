@@ -124,8 +124,9 @@ def Main(argv):
                 else:
                   updated_value = updated_value + "'"
               else:
-                # Non-string values(dicts) copy verbatim
-                updated_value = dart_v
+                # Non-string values(dicts) copy verbatim, keeping them sorted
+                # to ensure stable ordering of items.
+                updated_value = dict(sorted(dart_v.items()))
 
               updatedfile.write("  '%s':\n   %s,\n\n" % (k, updated_value))
               break
