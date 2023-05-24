@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("glfw_args.gni")
+
 _checkout_dir = "//third_party/glfw"
 
 config("relative_glfw_headers") {
@@ -115,6 +117,10 @@ source_set("glfw") {
       "CoreVideo.framework",
       "IOKit.framework",
     ]
+  }
+
+  if (glfw_vulkan_library != "") {
+    defines += [ "_GLFW_VULKAN_LIBRARY=" + glfw_vulkan_library ]
   }
 
   configs -= [ "//build/config/compiler:chromium_code" ]
