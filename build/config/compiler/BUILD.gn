@@ -762,7 +762,9 @@ config("rtti") {
   if (is_win) {
     cflags_cc = [ "/GR" ]
   } else {
-    cflags_cc = [ "-frtti" ]
+    rtti_flags = [ "-frtti" ]
+    cflags_cc = rtti_flags
+    cflags_objcc = rtti_flags
   }
 }
 config("no_rtti") {
