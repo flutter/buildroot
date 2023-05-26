@@ -9,5 +9,5 @@ vvl_glslang_dir = "//third_party/vulkan-deps/spirv-tools/src"
 
 
 # Subdirectories for generated files
-vulkan_data_subdir = ""
+vulkan_data_subdir = "vulkan-data"
 vulkan_gen_subdir = ""
