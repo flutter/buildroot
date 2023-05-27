@@ -530,15 +530,32 @@ def SetEnvironmentAndGetSDKDir():
 def GetToolchainDir():
   """Gets location information about the current toolchain (must have been
   previously updated by 'update'). This is used for the GN build."""
-  runtime_dll_dirs = SetEnvironmentAndGetRuntimeDllDirs()
-  win_sdk_dir = SetEnvironmentAndGetSDKDir()
-
-  print('''vs_path = %s
+  file_pattern = '''vs_path = %s
 sdk_path = %s
 vs_version = %s
 wdk_dir = %s
 runtime_dirs = %s
-''' % (ToGNString(NormalizePath(os.environ['GYP_MSVS_OVERRIDE_PATH'])),
+'''
+  # if DEPOT_TOOLS_WIN_TOOLCHAIN_ROOT try to get the info from data file.
+  depot_tools_win_toolchain_root = os.environ.get('DEPOT_TOOLS_WIN_TOOLCHAIN_ROOT')
+  data_file = os.path.join(depot_tools_win_toolchain_root, 'data.json')
+  if depot_tools_win_toolchain_root and os.path.exists(data_file):
+    # Print file content and return
+    with open(data_file) as f:
+      data = json.load(f)
+      print(file_pattern % (
+          ToGNString(NormalizePath(data.get('path'))),
+          ToGNString(data.get('win_sdk')),
+          ToGNString(data.get('version')),
+          ToGNString(NormalizePath(data.get('wdk', ''))),
+          ToGNString(os.path.pathsep.join(data.get('runtime_dirs', ['None'])))
+      ))
+      return
+
+  runtime_dll_dirs = SetEnvironmentAndGetRuntimeDllDirs()
+  win_sdk_dir = SetEnvironmentAndGetSDKDir()
+
+  print(file_pattern % (ToGNString(NormalizePath(os.environ['GYP_MSVS_OVERRIDE_PATH'])),
        ToGNString(win_sdk_dir), ToGNString(GetVisualStudioVersion()),
        ToGNString(NormalizePath(os.environ.get('WDK_DIR', ''))),
        ToGNString(os.path.pathsep.join(runtime_dll_dirs or ['None']))))
