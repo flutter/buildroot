@@ -463,10 +463,12 @@ foreach(layer_info, layers) {
     }
     if (is_android) {
       libs = [
+        "c++", # Note: C++ added by Flutter.
         "log",
         "nativewindow",
       ]
-      configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
+      # Note: config edit removed by Flutter
+      # configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
     }
     defines += layer_info[3]
   }

@@ -43,6 +43,8 @@ if (is_android) {
 
     # Unused. Required for GN files maintained in other buildroots.
     enable_java_templates = false
+
+    android_api_level = 22
   }
 
   # Host stuff -----------------------------------------------------------------
@@ -92,9 +94,7 @@ if (is_android) {
 
   # Subdirectories inside android_ndk_root that contain the sysroot for the
   # associated platform.
-  if (current_cpu == "x64" || current_cpu == "arm64") {
-    android_api_level = 22
-  } else {
+  if (current_cpu != "x64" && current_cpu != "arm64") {
     android_api_level = 16
   }
 
