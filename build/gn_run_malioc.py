@@ -40,7 +40,7 @@ except subprocess.CalledProcessError as ex:
     # Attempt to pretty print the json output, but fall back to printing the
     # raw output if doing so fails.
     try:
-      parsed = json.load(malioc_json)
+      parsed = json.loads(malioc_json)
       print(json.dumps(parsed, indent=2))
     except:
       print(malioc_json)
