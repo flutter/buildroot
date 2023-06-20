@@ -78,7 +78,13 @@ template("fuchsia_fidl_library") {
   meta_json = read_file(invoker.meta, "json")
   assert(meta_json.type == "fidl_library")
 
-  _deps = [ "//build/fuchsia/pkg:fidl_cpp" ]
+  _deps = [
+    "//build/fuchsia/pkg:fidl_cpp",
+    "//build/fuchsia/pkg/fidl_cpp_hlcpp_conversion",
+    "//build/fuchsia/pkg/fidl_cpp_natural_ostream",
+    "//build/fuchsia/pkg/fidl_cpp_v2",
+    "//build/fuchsia/pkg/fidl_cpp_wire",
+  ]
 
   library_name = meta_json.name
   library_name_json = "${meta_json.name}.json"
@@ -125,13 +131,36 @@ template("fuchsia_fidl_library") {
     if (!defined(invoker.only_generate_tables) ||
         !invoker.only_generate_tables) {
       outputs += [
-        "$target_gen_dir/$library_name_slashes/cpp/fidl.h",
         "$target_gen_dir/$library_name_slashes/cpp/fidl.cc",
+        "$target_gen_dir/$library_name_slashes/cpp/fidl.h",
+        "$target_gen_dir/$library_name_slashes/cpp/fidl_test_base.h",
+
+        "$target_gen_dir/fidl/$library_name/cpp/common_types.cc",
+        "$target_gen_dir/fidl/$library_name/cpp/common_types.h",
+        "$target_gen_dir/fidl/$library_name/cpp/fidl.h",
+        "$target_gen_dir/fidl/$library_name/cpp/hlcpp_conversion.h",
+        "$target_gen_dir/fidl/$library_name/cpp/markers.h",
+        "$target_gen_dir/fidl/$library_name/cpp/natural_messaging.cc",
+        "$target_gen_dir/fidl/$library_name/cpp/natural_messaging.h",
+        "$target_gen_dir/fidl/$library_name/cpp/natural_ostream.cc",
+        "$target_gen_dir/fidl/$library_name/cpp/natural_ostream.h",
+        "$target_gen_dir/fidl/$library_name/cpp/natural_types.cc",
+        "$target_gen_dir/fidl/$library_name/cpp/natural_types.h",
+        "$target_gen_dir/fidl/$library_name/cpp/type_conversions.cc",
+        "$target_gen_dir/fidl/$library_name/cpp/type_conversions.h",
+        "$target_gen_dir/fidl/$library_name/cpp/wire.h",
+        "$target_gen_dir/fidl/$library_name/cpp/wire_messaging.cc",
+        "$target_gen_dir/fidl/$library_name/cpp/wire_messaging.h",
+        "$target_gen_dir/fidl/$library_name/cpp/wire_test_base.h",
+        "$target_gen_dir/fidl/$library_name/cpp/wire_types.cc",
+        "$target_gen_dir/fidl/$library_name/cpp/wire_types.h",
       ]
 
       args += [
         "--fidlgen-bin",
-        rebase_path("${_fuchsia_tools_path}/fidlgen"),
+        rebase_path("${_fuchsia_tools_path}/fidlgen_cpp"),
+        "--fidlgen-bin",
+        rebase_path("${_fuchsia_tools_path}/fidlgen_hlcpp"),
         "--fidlgen-output-root",
         rebase_path("$target_gen_dir"),
       ]

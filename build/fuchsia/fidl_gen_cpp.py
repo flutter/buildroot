@@ -35,7 +35,7 @@ def main():
   parser = argparse.ArgumentParser();
 
   parser.add_argument('--fidlc-bin', dest='fidlc_bin', action='store', required=True)
-  parser.add_argument('--fidlgen-bin', dest='fidlgen_bin', action='store', required=False)
+  parser.add_argument('--fidlgen-bin', dest='fidlgen_bin', action='append', required=False)
 
   parser.add_argument('--sdk-base', dest='sdk_base', action='store', required=True)
   parser.add_argument('--root', dest='root', action='store', required=True)
@@ -82,15 +82,16 @@ def main():
 
   if args.fidlgen_output_root:
     assert os.path.exists(args.json)
-    fidlgen_command = [
-      args.fidlgen_bin,
-      '-json',
-      args.json,
-      '-root',
-      args.fidlgen_output_root
-    ]
+    for fidlgen_bin in args.fidlgen_bin:
+      fidlgen_command = [
+        fidlgen_bin,
+        '-json',
+        args.json,
+        '-root',
+        args.fidlgen_output_root
+      ]
 
-    subprocess.check_call(fidlgen_command)
+      subprocess.check_call(fidlgen_command)
 
   return 0
 
