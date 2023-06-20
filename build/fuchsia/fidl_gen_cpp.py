@@ -47,8 +47,6 @@ def main():
   args = parser.parse_args()
 
   assert os.path.exists(args.fidlc_bin)
-  # --fidlgen-bin and --fidlgen-output-root should be passed in together.
-  assert os.path.exists(args.fidlgen_bin or '') == bool(args.fidlgen_output_root)
 
   fidl_files_by_name = GetFIDLFilesByLibraryName(args.sdk_base, args.root)
 
@@ -83,6 +81,8 @@ def main():
   if args.fidlgen_output_root:
     assert os.path.exists(args.json)
     for fidlgen_bin in args.fidlgen_bin:
+      assert os.path.exists(fidlgen_bin)
+
       fidlgen_command = [
         fidlgen_bin,
         '-json',
@@ -92,6 +92,9 @@ def main():
       ]
 
       subprocess.check_call(fidlgen_command)
+  else:
+    # --fidlgen-bin and --fidlgen-output-root should be passed in together.
+    assert not args.fidlgen_bin
 
   return 0
 
