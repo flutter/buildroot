@@ -80,10 +80,10 @@ template("fuchsia_fidl_library") {
 
   _deps = [
     "//build/fuchsia/pkg:fidl_cpp",
-    "//build/fuchsia/pkg/fidl_cpp_hlcpp_conversion",
-    "//build/fuchsia/pkg/fidl_cpp_natural_ostream",
-    "//build/fuchsia/pkg/fidl_cpp_v2",
-    "//build/fuchsia/pkg/fidl_cpp_wire",
+    "//build/fuchsia/pkg:fidl_cpp_hlcpp_conversion",
+    "//build/fuchsia/pkg:fidl_cpp_natural_ostream",
+    "//build/fuchsia/pkg:fidl_cpp_v2",
+    "//build/fuchsia/pkg:fidl_cpp_wire",
   ]
 
   library_name = meta_json.name
