@@ -95,7 +95,7 @@ if (is_android) {
   # Subdirectories inside android_ndk_root that contain the sysroot for the
   # associated platform.
   if (current_cpu != "x64" && current_cpu != "arm64") {
-    android_api_level = 16
+    android_api_level = 19
   }
 
   # Toolchain root directory for each build. The actual binaries are inside
