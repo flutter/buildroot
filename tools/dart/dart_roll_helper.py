@@ -163,8 +163,9 @@ def run_flutter_doctor():
   print_status('Running flutter doctor')
   engine_src_path = '--local-engine-src-path={}'.format(engine_home())
   result = run_process(FLUTTER_DOCTOR + ['--local-engine=host_debug_unopt',
-                                    engine_src_path],
-                                    cwd=package_flutter_path())
+                                         '--local-engine-host=host_debug_unopt',
+                                         engine_src_path],
+                                         cwd=package_flutter_path())
   if result != 0:
     print_error('flutter doctor failed. Aborting roll.')
     sys.exit(ERROR_FLUTTER_DOCTOR_FAILED)
@@ -174,6 +175,7 @@ def run_tests():
   print_status('Running tests in packages/flutter')
   engine_src_path = '--local-engine-src-path={}'.format(engine_home())
   result = run_process(FLUTTER_TEST + ['--local-engine=host_debug_unopt',
+                                       '--local-engine-host=host_debug_unopt',
                                        engine_src_path],
                                        cwd=package_flutter_path())
   if result != 0:
@@ -182,6 +184,7 @@ def run_tests():
 
   print_status('Running tests in examples/flutter_gallery')
   result = run_process(FLUTTER_TEST + ['--local-engine=host_debug_unopt',
+                                       '--local-engine-host=host_debug_unopt',
                                        engine_src_path,
                                        '--disable-service-auth-codes'],
                                        cwd=flutter_gallery_path());
@@ -195,10 +198,12 @@ def run_hot_reload_configurations():
   engine_src_path = '--local-engine-src-path={}'.format(engine_home())
   run_process(FLUTTER_RUN + ['--release',
                              '--local-engine=android_release',
+                             '--local-engine-host=host_release',
                              engine_src_path],
                              cwd=flutter_gallery_path())
   print_status('Running flutter gallery debug')
   run_process(FLUTTER_RUN + ['--local-engine=android_debug_unopt',
+                             '--local-engine-host=host_debug_unopt',
                              engine_src_path],
                              cwd=flutter_gallery_path())
 
