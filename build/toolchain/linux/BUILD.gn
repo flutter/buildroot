@@ -5,21 +5,23 @@
 import("//build/config/sysroot.gni")
 import("//build/toolchain/ccache.gni")
 import("//build/toolchain/gcc_toolchain.gni")
-import("//build/toolchain/goma.gni")
+#import("//build/toolchain/goma.gni")
+import("//build/toolchain/rbe.gni")
 
 declare_args() {
   toolchain_prefix = ""
   # TODO(zra): Add an argument for overriding the host toolchain.
 }
 
-if (use_goma) {
-  assert(!use_ccache, "Goma and ccache can't be used together.")
-  compiler_prefix = "$goma_dir/gomacc "
-} else if (use_ccache) {
-  compiler_prefix = "ccache "
-} else {
-  compiler_prefix = ""
-}
+#if (use_goma) {
+#  assert(!use_ccache, "Goma and ccache can't be used together.")
+#  compiler_prefix = "$goma_dir/gomacc "
+#} else if (use_ccache) {
+#  compiler_prefix = "ccache "
+#} else {
+#  compiler_prefix = ""
+#}
+compiler_prefix = "$rbe_dir/rewrapper --server_address=unix:///tmp/reproxy.sock --labels=type=compile,compiler=clang,lang=cpp --exec_root=$exec_root --platform=container-image=docker://gcr.io/cloud-marketplace/google/debian11@sha256:69e2789c9f3d28c6a0f13b25062c240ee7772be1f5e6d41bb4680b63eae6b304 "
 
 if (host_cpu == "arm64") {
   rebased_clang_dir =

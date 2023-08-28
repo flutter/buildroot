@@ -1,0 +1,24 @@
+# Copyright (c) 2023 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Defines the configuration of rbe.
+#
+# This is currently designed to match the GYP build exactly, so as not to break
+# people during the transition.
+
+declare_args() {
+  # Set to true to enable distributed compilation using Goma.
+  use_remoteexec = false
+
+  exec_root = getenv("HOME")
+
+  # Set the default value based on the platform.
+  if (is_win) {
+    # Absolute directory containing the Goma source code.
+    rbe_dir = "C:\rbe\rbe-win"
+  } else {
+    # Absolute directory containing the Goma source code.
+    rbe_dir = getenv("HOME") + "/rbe"
+  }
+}
