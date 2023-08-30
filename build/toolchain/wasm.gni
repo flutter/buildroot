@@ -39,6 +39,7 @@ template("wasm_toolchain") {
     ar = "$compiler_prefix$emsdk_dir/upstream/emscripten/emar --em-config $em_config_path"
     cc = "$compiler_prefix$emsdk_dir/upstream/emscripten/emcc --em-config $em_config_path"
     cxx = "$compiler_prefix$emsdk_dir/upstream/emscripten/em++ --em-config $em_config_path"
+    asm = cc
 
     # emscripten emits this .worker.js file conditionally depending on whether
     # pthreads are on or not. Unfortunately, there is no way to conditionally

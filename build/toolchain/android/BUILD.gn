@@ -7,6 +7,7 @@ import("//build/toolchain/ccache.gni")
 import("//build/toolchain/clang.gni")
 import("//build/toolchain/gcc_toolchain.gni")
 import("//build/toolchain/goma.gni")
+import("//build/toolchain/rbe.gni")
 
 # The Android GCC toolchains share most of the same parameters, so we have this
 # wrapper around gcc_toolchain to avoid duplication of logic.
@@ -35,10 +36,31 @@ template("android_gcc_toolchain") {
     if (use_goma) {
       assert(!use_ccache, "Goma and ccache can't be used together.")
       compiler_prefix = "$goma_dir/gomacc "
+      link_prefix = "$goma_dir/gomacc "
+    } else if (use_rbe) {
+      assert(!use_goma)
+      rewrapper_args = [
+        "$rbe_dir/rewrapper",
+        "--server_address=$rbe_server_address",
+        "--exec_strategy=$rbe_exec_strategy",
+        "--dial_timeout=$rbe_dial_timeout",
+        "--exec_root=$rbe_exec_root",
+        "--platform=$rbe_platform",
+      ]
+      compiler_args = rewrapper_args + [
+        "--labels=type=compile,compiler=clang,lang=cpp ",
+      ]
+      link_args = rewrapper_args + [
+        "--labels=type=link,tool=clang ",
+      ]
+      compiler_prefix = string_join(" ", compiler_args)
+      link_prefix = string_join(" ", link_args)
     } else if (use_ccache) {
       compiler_prefix = "ccache "
+      link_prefix = "ccache "
     } else {
       compiler_prefix = ""
+      link_prefix = ""
     }
 
     is_clang = invoker.is_clang
@@ -54,18 +76,21 @@ template("android_gcc_toolchain") {
 
       prefix = rebase_path("//buildtools/$host_dir/clang/bin", root_build_dir)
 
+      asm = prefix + "/clang"
       cc = compiler_prefix + prefix + "/clang"
       cxx = compiler_prefix + prefix + "/clang++"
       ar = prefix + "/llvm-ar"
+      ld = link_prefix + prefix + "/clang++"
     } else {
+      asm = tool_prefix + "gcc"
       cc = compiler_prefix + tool_prefix + "gcc"
       cxx = compiler_prefix + tool_prefix + "g++"
       ar = tool_prefix + "ar"
+      ld = link_prefix + tool_prefix + "g++"
     }
 
-    ld = cxx
-    readelf = compiler_prefix + tool_prefix + "readelf"
-    nm = compiler_prefix + tool_prefix + "nm"
+    readelf = tool_prefix + "readelf"
+    nm = tool_prefix + "nm"
 
     toolchain_os = "android"
     toolchain_cpu = invoker.toolchain_cpu
