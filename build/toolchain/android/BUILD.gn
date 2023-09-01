@@ -21,6 +21,12 @@ import("//build/toolchain/rbe.gni")
 #      Same as gcc_toolchain
 template("android_gcc_toolchain") {
   gcc_toolchain(target_name) {
+    extra_toolchain_args = {
+      if (defined(invoker.extra_toolchain_args)) {
+        forward_variables_from(invoker.extra_toolchain_args, "*")
+      }
+    }
+
     # Make our manually injected libs relative to the build dir.
     android_ndk_lib = rebase_path(invoker.android_ndk_lib_dir, root_build_dir)
 
@@ -105,7 +111,7 @@ template("android_gcc_toolchain") {
     android_strip = "${tool_prefix}strip"
 
     strip_command =
-        "$android_strip --strip-unneeded -o $temp_stripped_soname $soname"
+        "$android_strip --strip-unneeded -o $temp_stripped_soname {{root_out_dir}}/$soname"
     replace_command = "if ! cmp -s $temp_stripped_soname $stripped_soname; then mv $temp_stripped_soname $stripped_soname; fi"
     postsolink = "$strip_command && $replace_command"
     solink_outputs = [ stripped_soname ]
@@ -122,11 +128,21 @@ template("android_gcc_toolchain") {
 
 template("android_gcc_toolchains_helper") {
   android_gcc_toolchain(target_name) {
+    extra_toolchain_args = {
+      if (defined(invoker.extra_toolchain_args)) {
+        forward_variables_from(invoker.extra_toolchain_args, "*")
+      }
+    }
     android_ndk_lib_dir = invoker.android_ndk_lib_dir
     tool_prefix = invoker.tool_prefix
     toolchain_cpu = invoker.toolchain_cpu
   }
   android_gcc_toolchain("clang_$target_name") {
+    extra_toolchain_args = {
+      if (defined(invoker.extra_toolchain_args)) {
+        forward_variables_from(invoker.extra_toolchain_args, "*")
+      }
+    }
     android_ndk_lib_dir = invoker.android_ndk_lib_dir
     tool_prefix = invoker.tool_prefix
     toolchain_cpu = invoker.toolchain_cpu
@@ -160,4 +176,14 @@ android_gcc_toolchains_helper("arm64") {
 
   tool_prefix = "$llvm_android_toolchain_root/bin/aarch64-linux-android-"
   toolchain_cpu = "aarch64"
+}
+
+android_gcc_toolchains_helper("arm64_apilevel26") {
+  android_ndk_lib_dir = arm64_android_lib
+
+  tool_prefix = "$llvm_android_toolchain_root/bin/aarch64-linux-android-"
+  toolchain_cpu = "arm64"
+  extra_toolchain_args = {
+    android_api_level = 26
+  }
 }
