@@ -632,6 +632,9 @@ if (is_win) {
 
       # Unqualified std::move is pretty common.
       "-Wno-unqualified-std-cast-call",
+
+      # Needed for nlohmann/json.
+      "-Wno-deprecated-literal-operator",
     ]
   }
 } else {
@@ -666,6 +669,9 @@ if (is_win) {
 
     # Needed for compiling Skia with clang-12
     "-Wno-psabi",
+
+    # Needed for nlohmann/json.
+    "-Wno-deprecated-literal-operator",
   ]
   if (!is_wasm) {
     default_warning_flags += [
