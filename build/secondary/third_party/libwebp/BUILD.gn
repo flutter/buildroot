@@ -34,6 +34,7 @@ source_set("libwebp_sse41") {
     "//third_party/libwebp/src/dsp/dec_sse41.c",
     "//third_party/libwebp/src/dsp/enc_sse41.c",
     "//third_party/libwebp/src/dsp/lossless_enc_sse41.c",
+    "//third_party/libwebp/src/dsp/lossless_sse41.c",
     "//third_party/libwebp/src/dsp/upsampling_sse41.c",
     "//third_party/libwebp/src/dsp/yuv_sse41.c",
   ]
