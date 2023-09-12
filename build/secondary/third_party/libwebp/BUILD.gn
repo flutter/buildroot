@@ -59,13 +59,6 @@ source_set("libwebp") {
   configs += [ ":libwebp_defines" ]
 
   sources = [
-    "//third_party/libwebp/sharpyuv/sharpyuv.c",
-    "//third_party/libwebp/sharpyuv/sharpyuv_cpu.c",
-    "//third_party/libwebp/sharpyuv/sharpyuv_csp.c",
-    "//third_party/libwebp/sharpyuv/sharpyuv_dsp.c",
-    "//third_party/libwebp/sharpyuv/sharpyuv_gamma.c",
-    "//third_party/libwebp/sharpyuv/sharpyuv_neon.c",
-    "//third_party/libwebp/sharpyuv/sharpyuv_sse2.c",
     "//third_party/libwebp/src/dec/alpha_dec.c",
     "//third_party/libwebp/src/dec/buffer_dec.c",
     "//third_party/libwebp/src/dec/frame_dec.c",
