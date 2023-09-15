@@ -34,6 +34,7 @@ source_set("libwebp_sse41") {
     "//third_party/libwebp/src/dsp/dec_sse41.c",
     "//third_party/libwebp/src/dsp/enc_sse41.c",
     "//third_party/libwebp/src/dsp/lossless_enc_sse41.c",
+    "//third_party/libwebp/src/dsp/lossless_sse41.c",
     "//third_party/libwebp/src/dsp/upsampling_sse41.c",
     "//third_party/libwebp/src/dsp/yuv_sse41.c",
   ]
@@ -58,6 +59,13 @@ source_set("libwebp") {
   configs += [ ":libwebp_defines" ]
 
   sources = [
+    "//third_party/libwebp/sharpyuv/sharpyuv.c",
+    "//third_party/libwebp/sharpyuv/sharpyuv_cpu.c",
+    "//third_party/libwebp/sharpyuv/sharpyuv_csp.c",
+    "//third_party/libwebp/sharpyuv/sharpyuv_dsp.c",
+    "//third_party/libwebp/sharpyuv/sharpyuv_gamma.c",
+    "//third_party/libwebp/sharpyuv/sharpyuv_neon.c",
+    "//third_party/libwebp/sharpyuv/sharpyuv_sse2.c",
     "//third_party/libwebp/src/dec/alpha_dec.c",
     "//third_party/libwebp/src/dec/buffer_dec.c",
     "//third_party/libwebp/src/dec/frame_dec.c",
