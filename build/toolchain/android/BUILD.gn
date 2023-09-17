@@ -40,22 +40,14 @@ template("android_gcc_toolchain") {
     tool_prefix = rebase_path(invoker.tool_prefix, root_build_dir)
 
     if (use_goma) {
+      assert(!use_rbe, "Goma and RBE can't be used together.")
       assert(!use_ccache, "Goma and ccache can't be used together.")
       compiler_prefix = "$goma_dir/gomacc "
       link_prefix = "$goma_dir/gomacc "
     } else if (use_rbe) {
-      assert(!use_goma)
-      rewrapper_args = [
-        "$rbe_dir/rewrapper",
-        "--server_address=$rbe_server_address",
-        "--exec_strategy=$rbe_exec_strategy",
-        "--dial_timeout=$rbe_dial_timeout",
-        "--exec_root=$rbe_exec_root",
-        "--platform=$rbe_platform",
-      ]
       compiler_args =
-          rewrapper_args + [ "--labels=type=compile,compiler=clang,lang=cpp " ]
-      link_args = rewrapper_args + [ "--labels=type=link,tool=clang " ]
+          rewrapper_command + [ "--labels=type=compile,compiler=clang,lang=cpp " ]
+      link_args = rewrapper_command + [ "--labels=type=link,tool=clang " ]
       compiler_prefix = string_join(" ", compiler_args)
       link_prefix = string_join(" ", link_args)
     } else if (use_ccache) {
