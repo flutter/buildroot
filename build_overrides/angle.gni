@@ -21,6 +21,7 @@ if (!is_fuchsia) {
 angle_abseil_cpp_dir = "//third_party/abseil-cpp"
 angle_glslang_dir = "//third_party/vulkan-deps/glslang/src"
 angle_googletest_dir = "//third_party/googletest/googletest/src"
+
 # Note: This path doesn't actually exist; see
 # //build/secondary/third_party/jsoncpp/BUILD.gn
 angle_jsoncpp_dir = "//third_party/jsoncpp"

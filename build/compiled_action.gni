@@ -89,7 +89,7 @@ template("compiled_action") {
                              "pool",
                              "outputs",
                            ])
-                           
+
     script = "//build/gn_run_binary.py"
 
     if (defined(invoker.inputs)) {

@@ -105,27 +105,27 @@ config("vulkan_layer_config") {
 }
 
 core_validation_sources = [
-  "$_checkout_dir/layers/utils/android_ndk_types.h",
-  "$_checkout_dir/layers/utils/convert_to_renderpass2.cpp",
-  "$_checkout_dir/layers/utils/convert_to_renderpass2.h",
+  "$_checkout_dir/layers/containers/qfo_transfer.h",
+  "$_checkout_dir/layers/containers/range_vector.h",
+  "$_checkout_dir/layers/containers/subresource_adapter.cpp",
+  "$_checkout_dir/layers/containers/subresource_adapter.h",
   "$_checkout_dir/layers/core_checks/cc_android.cpp",
   "$_checkout_dir/layers/core_checks/cc_buffer.cpp",
   "$_checkout_dir/layers/core_checks/cc_buffer_address.h",
-  "$_checkout_dir/layers/core_checks/cc_cmd_buffer_dynamic.cpp",
   "$_checkout_dir/layers/core_checks/cc_cmd_buffer.cpp",
+  "$_checkout_dir/layers/core_checks/cc_cmd_buffer_dynamic.cpp",
   "$_checkout_dir/layers/core_checks/cc_copy_blit_resolve.cpp",
-  "$_checkout_dir/layers/core_checks/core_validation.h",
   "$_checkout_dir/layers/core_checks/cc_descriptor.cpp",
-  "$_checkout_dir/layers/core_checks/cc_device_memory.cpp",
   "$_checkout_dir/layers/core_checks/cc_device.cpp",
+  "$_checkout_dir/layers/core_checks/cc_device_memory.cpp",
   "$_checkout_dir/layers/core_checks/cc_drawdispatch.cpp",
   "$_checkout_dir/layers/core_checks/cc_external_object.cpp",
   "$_checkout_dir/layers/core_checks/cc_image.cpp",
   "$_checkout_dir/layers/core_checks/cc_image_layout.cpp",
+  "$_checkout_dir/layers/core_checks/cc_pipeline.cpp",
   "$_checkout_dir/layers/core_checks/cc_pipeline_compute.cpp",
   "$_checkout_dir/layers/core_checks/cc_pipeline_graphics.cpp",
   "$_checkout_dir/layers/core_checks/cc_pipeline_ray_tracing.cpp",
-  "$_checkout_dir/layers/core_checks/cc_pipeline.cpp",
   "$_checkout_dir/layers/core_checks/cc_query.cpp",
   "$_checkout_dir/layers/core_checks/cc_queue.cpp",
   "$_checkout_dir/layers/core_checks/cc_ray_tracing.cpp",
@@ -136,6 +136,7 @@ core_validation_sources = [
   "$_checkout_dir/layers/core_checks/cc_video.cpp",
   "$_checkout_dir/layers/core_checks/cc_wsi.cpp",
   "$_checkout_dir/layers/core_checks/cc_ycbcr.cpp",
+  "$_checkout_dir/layers/core_checks/core_validation.h",
   "$_checkout_dir/layers/error_message/core_error_location.cpp",
   "$_checkout_dir/layers/error_message/core_error_location.h",
   "$_checkout_dir/layers/error_message/validation_error_enums.h",
@@ -158,8 +159,6 @@ core_validation_sources = [
   "$_checkout_dir/layers/gpu_validation/gpu_validation.cpp",
   "$_checkout_dir/layers/gpu_validation/gpu_validation.h",
   "$_checkout_dir/layers/gpu_validation/gpu_vuids.h",
-  "$_checkout_dir/layers/containers/qfo_transfer.h",
-  "$_checkout_dir/layers/containers/range_vector.h",
   "$_checkout_dir/layers/state_tracker/base_node.cpp",
   "$_checkout_dir/layers/state_tracker/base_node.h",
   "$_checkout_dir/layers/state_tracker/buffer_state.cpp",
@@ -188,22 +187,23 @@ core_validation_sources = [
   "$_checkout_dir/layers/state_tracker/render_pass_state.cpp",
   "$_checkout_dir/layers/state_tracker/render_pass_state.h",
   "$_checkout_dir/layers/state_tracker/sampler_state.h",
-  "$_checkout_dir/layers/state_tracker/shader_module.cpp",
-  "$_checkout_dir/layers/state_tracker/shader_module.h",
   "$_checkout_dir/layers/state_tracker/shader_instruction.cpp",
   "$_checkout_dir/layers/state_tracker/shader_instruction.h",
+  "$_checkout_dir/layers/state_tracker/shader_module.cpp",
+  "$_checkout_dir/layers/state_tracker/shader_module.h",
   "$_checkout_dir/layers/state_tracker/state_tracker.cpp",
   "$_checkout_dir/layers/state_tracker/state_tracker.h",
   "$_checkout_dir/layers/state_tracker/video_session_state.cpp",
   "$_checkout_dir/layers/state_tracker/video_session_state.h",
-  "$_checkout_dir/layers/containers/subresource_adapter.cpp",
-  "$_checkout_dir/layers/containers/subresource_adapter.h",
   "$_checkout_dir/layers/sync/sync_utils.cpp",
   "$_checkout_dir/layers/sync/sync_utils.h",
-  "$_checkout_dir/layers/sync/sync_vuid_maps.cpp",
-  "$_checkout_dir/layers/sync/sync_vuid_maps.h",
   "$_checkout_dir/layers/sync/sync_validation.cpp",
   "$_checkout_dir/layers/sync/sync_validation.h",
+  "$_checkout_dir/layers/sync/sync_vuid_maps.cpp",
+  "$_checkout_dir/layers/sync/sync_vuid_maps.h",
+  "$_checkout_dir/layers/utils/android_ndk_types.h",
+  "$_checkout_dir/layers/utils/convert_to_renderpass2.cpp",
+  "$_checkout_dir/layers/utils/convert_to_renderpass2.h",
 ]
 
 object_lifetimes_sources = [
@@ -214,13 +214,13 @@ object_lifetimes_sources = [
 ]
 
 stateless_validation_sources = [
+  "$_checkout_dir/layers/generated/enum_flag_bits.h",
   "$_checkout_dir/layers/generated/parameter_validation.cpp",
   "$_checkout_dir/layers/generated/parameter_validation.h",
-  "$_checkout_dir/layers/generated/enum_flag_bits.h",
   "$_checkout_dir/layers/stateless/parameter_name.h",
   "$_checkout_dir/layers/stateless/sl_buffer.cpp",
-  "$_checkout_dir/layers/stateless/sl_cmd_buffer_dynamic.cpp",
   "$_checkout_dir/layers/stateless/sl_cmd_buffer.cpp",
+  "$_checkout_dir/layers/stateless/sl_cmd_buffer_dynamic.cpp",
   "$_checkout_dir/layers/stateless/sl_descriptor.cpp",
   "$_checkout_dir/layers/stateless/sl_device_memory.cpp",
   "$_checkout_dir/layers/stateless/sl_external_object.cpp",
@@ -245,6 +245,7 @@ unique_objects_sources = []
 best_practices_sources = [
   "$_checkout_dir/layers/best_practices/best_practices_error_enums.h",
   "$_checkout_dir/layers/best_practices/best_practices_utils.cpp",
+  "$_checkout_dir/layers/best_practices/best_practices_validation.h",
   "$_checkout_dir/layers/best_practices/bp_buffer.cpp",
   "$_checkout_dir/layers/best_practices/bp_cmd_buffer.cpp",
   "$_checkout_dir/layers/best_practices/bp_copy_blit_resolve.cpp",
@@ -260,7 +261,6 @@ best_practices_sources = [
   "$_checkout_dir/layers/best_practices/bp_synchronization.cpp",
   "$_checkout_dir/layers/best_practices/bp_video.cpp",
   "$_checkout_dir/layers/best_practices/bp_wsi.cpp",
-  "$_checkout_dir/layers/best_practices/best_practices_validation.h",
   "$_checkout_dir/layers/generated/best_practices.cpp",
   "$_checkout_dir/layers/generated/best_practices.h",
 ]
@@ -271,21 +271,21 @@ debug_printf_sources = [
 ]
 
 chassis_sources = [
-  "$vulkan_headers_dir/include/vulkan/vk_layer.h",
-  "$vulkan_headers_dir/include/vulkan/vulkan.h",
   "$_checkout_dir/layers/generated/chassis.cpp",
-  "$_checkout_dir/layers/generated/valid_param_values.cpp",
-  "$_checkout_dir/layers/generated/valid_param_values.h",
   "$_checkout_dir/layers/generated/chassis.h",
   "$_checkout_dir/layers/generated/chassis_dispatch_helper.h",
   "$_checkout_dir/layers/generated/layer_chassis_dispatch.cpp",
   "$_checkout_dir/layers/generated/layer_chassis_dispatch.h",
+  "$_checkout_dir/layers/generated/valid_param_values.cpp",
+  "$_checkout_dir/layers/generated/valid_param_values.h",
   "$_checkout_dir/layers/generated/vk_dispatch_table_helper.h",
   "$_checkout_dir/layers/generated/vk_extension_helper.h",
   "$_checkout_dir/layers/generated/vk_safe_struct.cpp",
   "$_checkout_dir/layers/layer_options.cpp",
   "$_checkout_dir/layers/layer_options.h",
   "$_checkout_dir/layers/vk_layer_settings_ext.h",
+  "$vulkan_headers_dir/include/vulkan/vk_layer.h",
+  "$vulkan_headers_dir/include/vulkan/vulkan.h",
 ]
 
 layers = [ [
@@ -351,10 +351,12 @@ source_set("vulkan_layer_utils") {
     "$_checkout_dir/layers/generated",
   ]
   sources = [
-    "$vulkan_headers_dir/include/vulkan/vk_layer.h",
-    "$vulkan_headers_dir/include/vulkan/vulkan.h",
-    "$_checkout_dir/layers/utils/android_ndk_types.h",
-    "$_checkout_dir/layers/utils/cast_utils.h",
+    "$_checkout_dir/layers/containers/custom_containers.h",
+    "$_checkout_dir/layers/containers/sparse_containers.h",
+    "$_checkout_dir/layers/error_message/logging.cpp",
+    "$_checkout_dir/layers/error_message/logging.h",
+    "$_checkout_dir/layers/external/xxhash.cpp",
+    "$_checkout_dir/layers/external/xxhash.h",
     "$_checkout_dir/layers/generated/vk_enum_string_helper.h",
     "$_checkout_dir/layers/generated/vk_extension_helper.h",
     "$_checkout_dir/layers/generated/vk_format_utils.cpp",
@@ -364,20 +366,18 @@ source_set("vulkan_layer_utils") {
     "$_checkout_dir/layers/generated/vk_safe_struct.h",
     "$_checkout_dir/layers/generated/vk_typemap_helper.h",
     "$_checkout_dir/layers/generated/vk_validation_error_messages.h",
+    "$_checkout_dir/layers/utils/android_ndk_types.h",
+    "$_checkout_dir/layers/utils/cast_utils.h",
     "$_checkout_dir/layers/utils/hash_util.h",
     "$_checkout_dir/layers/utils/hash_vk_types.h",
-    "$_checkout_dir/layers/containers/sparse_containers.h",
-    "$_checkout_dir/layers/containers/custom_containers.h",
-    "$_checkout_dir/layers/vk_layer_config.cpp",
-    "$_checkout_dir/layers/vk_layer_config.h",
     "$_checkout_dir/layers/utils/vk_layer_extension_utils.cpp",
     "$_checkout_dir/layers/utils/vk_layer_extension_utils.h",
-    "$_checkout_dir/layers/error_message/logging.h",
-    "$_checkout_dir/layers/error_message/logging.cpp",
     "$_checkout_dir/layers/utils/vk_layer_utils.cpp",
     "$_checkout_dir/layers/utils/vk_layer_utils.h",
-    "$_checkout_dir/layers/external/xxhash.cpp",
-    "$_checkout_dir/layers/external/xxhash.h",
+    "$_checkout_dir/layers/vk_layer_config.cpp",
+    "$_checkout_dir/layers/vk_layer_config.h",
+    "$vulkan_headers_dir/include/vulkan/vk_layer.h",
+    "$vulkan_headers_dir/include/vulkan/vulkan.h",
   ]
   defines = [ "XXH_NO_LONG_LONG" ]
   public_configs = [
@@ -433,6 +433,7 @@ foreach(layer_info, layers) {
     } else {
       configs -= [ "//build/config/compiler:chromium_code" ]
       configs += [ "//build/config/compiler:no_chromium_code" ]
+
       # The following line is what has to change to fix chromium compilation.
       configs -= [ "//build/config/compiler:no_rtti" ]
       configs += [ "//build/config/compiler:rtti" ]
@@ -463,7 +464,7 @@ foreach(layer_info, layers) {
     }
     if (is_android) {
       libs = [
-        "c++", # Note: C++ added by Flutter.
+        "c++",  # Note: C++ added by Flutter.
         "log",
         "nativewindow",
       ]

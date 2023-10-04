@@ -58,11 +58,10 @@ template("wasm_toolchain") {
 
     is_clang = true
 
-    link_outputs = [
-      "{{root_out_dir}}/{{target_output_name}}.wasm",
-    ]
+    link_outputs = [ "{{root_out_dir}}/{{target_output_name}}.wasm" ]
 
-    if (wasm_use_pthreads || (defined(extra_toolchain_args.wasm_use_pthreads) && extra_toolchain_args.wasm_use_pthreads)) {
+    if (wasm_use_pthreads || (defined(extra_toolchain_args.wasm_use_pthreads) &&
+                              extra_toolchain_args.wasm_use_pthreads)) {
       link_outputs += [ "{{root_out_dir}}/{{target_output_name}}.worker.js" ]
     }
 
