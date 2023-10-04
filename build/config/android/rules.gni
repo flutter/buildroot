@@ -4,5 +4,4 @@
 
 # TODO(dnfield): Patch icu to not depend on this file
 import("//build/config/android/config.gni")
-
 assert(is_android)

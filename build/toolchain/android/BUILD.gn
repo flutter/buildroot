@@ -53,12 +53,9 @@ template("android_gcc_toolchain") {
         "--exec_root=$rbe_exec_root",
         "--platform=$rbe_platform",
       ]
-      compiler_args = rewrapper_args + [
-        "--labels=type=compile,compiler=clang,lang=cpp ",
-      ]
-      link_args = rewrapper_args + [
-        "--labels=type=link,tool=clang ",
-      ]
+      compiler_args =
+          rewrapper_args + [ "--labels=type=compile,compiler=clang,lang=cpp " ]
+      link_args = rewrapper_args + [ "--labels=type=link,tool=clang " ]
       compiler_prefix = string_join(" ", compiler_args)
       link_prefix = string_join(" ", link_args)
     } else if (use_ccache) {
@@ -110,8 +107,7 @@ template("android_gcc_toolchain") {
 
     android_strip = "${tool_prefix}strip"
 
-    strip_command =
-        "$android_strip --strip-unneeded -o $temp_stripped_soname {{root_out_dir}}/$soname"
+    strip_command = "$android_strip --strip-unneeded -o $temp_stripped_soname {{root_out_dir}}/$soname"
     replace_command = "if ! cmp -s $temp_stripped_soname $stripped_soname; then mv $temp_stripped_soname $stripped_soname; fi"
     postsolink = "$strip_command && $replace_command"
     solink_outputs = [ stripped_soname ]
