@@ -44,7 +44,6 @@ source_set("glfw") {
   if (is_win) {
     sources += [
       "$_checkout_dir/src/wgl_context.c",
-      "$_checkout_dir/src/wgl_context.h",
       "$_checkout_dir/src/win32_init.c",
       "$_checkout_dir/src/win32_joystick.c",
       "$_checkout_dir/src/win32_joystick.h",
@@ -60,7 +59,6 @@ source_set("glfw") {
   } else if (is_linux) {
     sources += [
       "$_checkout_dir/src/glx_context.c",
-      "$_checkout_dir/src/glx_context.h",
       "$_checkout_dir/src/linux_joystick.c",
       "$_checkout_dir/src/linux_joystick.h",
       "$_checkout_dir/src/posix_module.c",
@@ -99,7 +97,6 @@ source_set("glfw") {
       "$_checkout_dir/src/cocoa_platform.h",
       "$_checkout_dir/src/cocoa_time.c",
       "$_checkout_dir/src/cocoa_window.m",
-      "$_checkout_dir/src/nsgl_context.h",
       "$_checkout_dir/src/nsgl_context.m",
       "$_checkout_dir/src/posix_module.c",
       "$_checkout_dir/src/posix_thread.c",
