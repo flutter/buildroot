@@ -36,7 +36,7 @@ config("imgui_headers") {
 source_set("imgui_glfw") {
   public_deps = [
     ":imgui",
-    "//third_party/glfw",
+    "//flutter/third_party/glfw",
   ]
 
   public_configs = [ ":imgui_headers" ]
