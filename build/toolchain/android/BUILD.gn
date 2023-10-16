@@ -27,14 +27,16 @@ template("android_gcc_toolchain") {
       }
     }
 
-    # Make our manually injected libs relative to the build dir.
-    android_ndk_lib = rebase_path(invoker.android_ndk_lib_dir, root_build_dir)
-
-    libs_section_prefix = "$android_ndk_lib/crtbegin_dynamic.o"
-    libs_section_postfix = "$android_ndk_lib/crtend_android.o"
-
-    solink_libs_section_prefix = "$android_ndk_lib/crtbegin_so.o"
-    solink_libs_section_postfix = "$android_ndk_lib/crtend_so.o"
+    if (android_ndk_version <= 22) {
+      # Make our manually injected libs relative to the build dir.
+      android_ndk_lib = rebase_path(invoker.android_ndk_lib_dir, root_build_dir)
+      libs_section_prefix = "$android_ndk_lib/crtbegin_dynamic.o"
+      libs_section_postfix = "$android_ndk_lib/crtend_android.o"
+      solink_libs_section_prefix = "$android_ndk_lib/crtbegin_so.o"
+      solink_libs_section_postfix = "$android_ndk_lib/crtend_so.o"
+    } else {
+      not_needed(invoker, ["android_ndk_lib_dir"])
+    }
 
     # The tools should be run relative to the build dir.
     tool_prefix = rebase_path(invoker.tool_prefix, root_build_dir)
@@ -77,23 +79,32 @@ template("android_gcc_toolchain") {
         assert(false, "Unknown host")
       }
 
-      prefix = rebase_path("//buildtools/$host_dir/clang/bin", root_build_dir)
-
+      if (android_ndk_version > 22) {
+        # When building with a newer NDK, use the toolchain bundled with the
+        # NDK.
+        prefix = rebase_path("$llvm_android_toolchain_root/bin", root_build_dir)
+      } else {
+        # When building with an older NDK, use our toolchain.
+        prefix = rebase_path("//buildtools/$host_dir/clang/bin", root_build_dir)
+      }
       asm = prefix + "/clang"
       cc = compiler_prefix + prefix + "/clang"
       cxx = compiler_prefix + prefix + "/clang++"
       ar = prefix + "/llvm-ar"
       ld = link_prefix + prefix + "/clang++"
+      readelf = tool_prefix + "/llvm-readelf"
+      nm = tool_prefix + "/llvm-nm"
+      strip = prefix + "/llvm-strip"
     } else {
       asm = tool_prefix + "gcc"
       cc = compiler_prefix + tool_prefix + "gcc"
       cxx = compiler_prefix + tool_prefix + "g++"
       ar = tool_prefix + "ar"
       ld = link_prefix + tool_prefix + "g++"
+      readelf = tool_prefix + "/llvm-readelf"
+      nm = tool_prefix + "/llvm-nm"
+      strip = tool_prefix + "strip"
     }
-
-    readelf = tool_prefix + "readelf"
-    nm = tool_prefix + "nm"
 
     toolchain_os = "android"
     toolchain_cpu = invoker.toolchain_cpu
@@ -105,9 +116,7 @@ template("android_gcc_toolchain") {
     stripped_soname = "lib.stripped/${soname}"
     temp_stripped_soname = "${stripped_soname}.tmp"
 
-    android_strip = "${tool_prefix}strip"
-
-    strip_command = "$android_strip --strip-unneeded -o $temp_stripped_soname {{root_out_dir}}/$soname"
+    strip_command = "$strip --strip-unneeded -o $temp_stripped_soname {{root_out_dir}}/$soname"
     replace_command = "if ! cmp -s $temp_stripped_soname $stripped_soname; then mv $temp_stripped_soname $stripped_soname; fi"
     postsolink = "$strip_command && $replace_command"
     solink_outputs = [ stripped_soname ]
@@ -117,7 +126,7 @@ template("android_gcc_toolchain") {
     # the following definition.
     exe = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
     stripped_exe = "exe.stripped/$exe"
-    postlink = "$android_strip --strip-unneeded -o $stripped_exe $exe"
+    postlink = "$strip --strip-unneeded -o $stripped_exe $exe"
     link_outputs = [ stripped_exe ]
   }
 }
@@ -147,28 +156,28 @@ template("android_gcc_toolchains_helper") {
 }
 
 android_gcc_toolchains_helper("x86") {
-  android_ndk_lib_dir = x86_android_lib
+  android_ndk_lib_dir = android_lib
 
   tool_prefix = "$llvm_android_toolchain_root/bin/i686-linux-android-"
   toolchain_cpu = "x86"
 }
 
 android_gcc_toolchains_helper("arm") {
-  android_ndk_lib_dir = arm_android_lib
+  android_ndk_lib_dir = android_lib
 
   tool_prefix = "$llvm_android_toolchain_root/bin/arm-linux-androideabi-"
   toolchain_cpu = "arm"
 }
 
 android_gcc_toolchains_helper("x64") {
-  android_ndk_lib_dir = x86_64_android_lib
+  android_ndk_lib_dir = android_lib
 
   tool_prefix = "$llvm_android_toolchain_root/bin/x86_64-linux-android-"
   toolchain_cpu = "x86_64"
 }
 
 android_gcc_toolchains_helper("arm64") {
-  android_ndk_lib_dir = arm64_android_lib
+  android_ndk_lib_dir = android_lib
 
   tool_prefix = "$llvm_android_toolchain_root/bin/aarch64-linux-android-"
   toolchain_cpu = "aarch64"
@@ -179,11 +188,18 @@ android_gcc_toolchains_helper("arm64") {
 # layers requires API level >= 26, but Flutter officially supports down to API
 # level 22, which is the default value of the android_api_level argument.
 android_gcc_toolchains_helper("arm64_apilevel26") {
-  android_ndk_lib_dir = arm64_android_lib
+  android_ndk_lib_dir = android_lib
 
   tool_prefix = "$llvm_android_toolchain_root/bin/aarch64-linux-android-"
   toolchain_cpu = "arm64"
   extra_toolchain_args = {
     android_api_level = 26
   }
+}
+
+android_gcc_toolchains_helper("riscv64") {
+  android_ndk_lib_dir = android_lib
+
+  tool_prefix = "$llvm_android_toolchain_root/bin"
+  toolchain_cpu = "riscv64"
 }

@@ -393,7 +393,7 @@ config("compiler") {
     # to say that it does. Define them here instead.
     defines += [ "HAVE_SYS_UIO_H" ]
 
-    if (is_clang) {
+    if (is_clang && android_ndk_version <= 22) {
       # Let clang find libgcc.
       ldflags += [ "--gcc-toolchain=" +
                    rebase_path(android_toolchain_root, root_build_dir) ]
@@ -425,6 +425,9 @@ config("compiler") {
       } else if (current_cpu == "x64") {
         cflags += [ "--target=x86_64-linux-androideabi" ]
         ldflags += [ "--target=x86_64-linux-androideabi" ]
+      } else if (current_cpu == "riscv64") {
+        cflags += [ "--target=riscv64-linux-android${android_api_level}" ]
+        ldflags += [ "--target=riscv64-linux-android${android_api_level}" ]
       }
     }
   }
@@ -555,12 +558,14 @@ config("runtime_library") {
       ]
     }
 
-    ldflags += [ "-nostdlib" ]
-
-    cflags += [ "-D__ANDROID_API__=$android_api_level" ]
-
-    # libunwind and libandroid_support also live in $android_libcpp_root.
-    lib_dirs += [ "$android_libcpp_root/libs/$android_app_abi" ]
+    if (android_ndk_version <= 22) {
+      ldflags += [ "-nostdlib" ]
+      cflags += [ "-D__ANDROID_API__=$android_api_level" ]
+      lib_dirs += [ "$android_libcpp_root/libs/$android_app_abi" ]
+      libs += [ "gcc" ]
+    } else {
+      lib_dirs += [ android_libcpp_root ]
+    }
 
     if (android_api_level < 21) {
       libs += [ "android_support" ]
@@ -571,7 +576,6 @@ config("runtime_library") {
     }
 
     libs += [
-      "gcc",
       "c",
       "dl",
       "m",
@@ -669,10 +673,13 @@ if (is_win) {
 
     # Needed for compiling Skia with clang-12
     "-Wno-psabi",
-
-    # Needed for nlohmann/json.
-    "-Wno-deprecated-literal-operator",
   ]
+  if (!is_android || android_ndk_version <= 22) {
+    default_warning_flags += [
+      # Needed for nlohmann/json.
+      "-Wno-deprecated-literal-operator",
+    ]
+  }
   if (!is_wasm) {
     default_warning_flags += [
       # Unqualified std::move is pretty common.
