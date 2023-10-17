@@ -32,7 +32,7 @@ from gn_helpers import ToGNString
 script_dir = os.path.dirname(os.path.realpath(__file__))
 json_data_file = os.path.join(script_dir, 'win_toolchain.json')
 
-sys.path.insert(0, os.path.join(script_dir, '..', 'tools'))
+sys.path.insert(0, os.path.join(script_dir))
 
 # VS versions are listed in descending order of priority (highest first).
 MSVS_VERSIONS = collections.OrderedDict([
