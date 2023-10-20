@@ -667,7 +667,6 @@ if (is_win) {
     "-Wno-unused-but-set-parameter",
     "-Wno-unused-but-set-variable",
     "-Wno-implicit-int-float-conversion",
-    "-Wno-c99-designator",
     "-Wno-deprecated-copy",
 
     # Needed for compiling Skia with clang-12
