@@ -136,6 +136,7 @@ template("fuchsia_fidl_library") {
         "$target_gen_dir/$library_name_slashes/cpp/fidl.cc",
         "$target_gen_dir/$library_name_slashes/cpp/fidl.h",
         "$target_gen_dir/$library_name_slashes/cpp/fidl_test_base.h",
+        "$target_gen_dir/$library_name_slashes/cpp/tables.c",
 
         "$target_gen_dir/fidl/$library_name/cpp/common_types.cc",
         "$target_gen_dir/fidl/$library_name/cpp/common_types.h",
@@ -165,6 +166,9 @@ template("fuchsia_fidl_library") {
         rebase_path("${_fuchsia_tools_path}/fidlgen_hlcpp"),
         "--fidlgen-output-root",
         rebase_path("$target_gen_dir"),
+        # TODO(fxbug.dev/39388): Remove after https://fxrev.dev/953989 rolls into flutter.
+        "--new-tables-path",
+        rebase_path("$target_gen_dir/$library_name_slashes/cpp/tables.c"),
       ]
     }
   }
