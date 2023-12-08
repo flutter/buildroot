@@ -23,11 +23,6 @@ DIR_SOURCE_ROOT = os.environ.get('CHECKOUT_SOURCE_ROOT',
     os.path.abspath(os.path.join(os.path.dirname(__file__),
                                  os.pardir, os.pardir, os.pardir, os.pardir)))
 
-CHROMIUM_SRC = os.path.normpath(
-    os.path.join(os.path.dirname(__file__),
-                 os.pardir, os.pardir, os.pardir, os.pardir))
-COLORAMA_ROOT = os.path.join(CHROMIUM_SRC,
-                             'third_party', 'colorama', 'src')
 # aapt should ignore OWNERS files in addition the default ignore pattern.
 AAPT_IGNORE_PATTERN = ('!OWNERS:!.svn:!.git:!.ds_store:!*.scc:.*:<dir>_*:' +
                        '!CVS:!thumbs.db:!picasa.ini:!*~:!*.d.stamp')
