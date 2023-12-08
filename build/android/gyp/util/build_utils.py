@@ -26,8 +26,19 @@ DIR_SOURCE_ROOT = os.environ.get('CHECKOUT_SOURCE_ROOT',
 CHROMIUM_SRC = os.path.normpath(
     os.path.join(os.path.dirname(__file__),
                  os.pardir, os.pardir, os.pardir, os.pardir))
+
+# TODO(matanlurey): This is to temporarily (for a ~PR) allow colorama to be
+# placed in flutter/third_party (https://github.com/flutter/engine/pull/48842).
+#
+# See https://github.com/flutter/flutter/issues/67373
 COLORAMA_ROOT = os.path.join(CHROMIUM_SRC,
                              'third_party', 'colorama', 'src')
+
+# If we already moved colorama to flutter/third_party, use that path instead.
+if not os.path.exists(COLORAMA_ROOT):
+  COLORAMA_ROOT = os.path.join(CHROMIUM_SRC, 
+                               'flutter', 'third_party', 'colorama', 'src')
+
 # aapt should ignore OWNERS files in addition the default ignore pattern.
 AAPT_IGNORE_PATTERN = ('!OWNERS:!.svn:!.git:!.ds_store:!*.scc:.*:<dir>_*:' +
                        '!CVS:!thumbs.db:!picasa.ini:!*~:!*.d.stamp')
