@@ -4,24 +4,19 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import distutils.spawn
 import fnmatch
 import optparse
 import os
 import shutil
 import re
-import subprocess
 import sys
 import textwrap
 
+from util import ansi_colors
 from util import build_utils
 from util import md5_check
 
 import jar
-
-sys.path.append(build_utils.COLORAMA_ROOT)
-import colorama
-
 
 def ColorJavacOutput(output):
   fileline_prefix = r'(?P<fileline>(?P<file>[-.\w/\\]+.java):(?P<line>[0-9]+):)'
@@ -31,9 +26,9 @@ def ColorJavacOutput(output):
       fileline_prefix + r'(?P<full_message> (?P<message>.*))$')
   marker_re = re.compile(r'\s*(?P<marker>\^)\s*$')
 
-  warning_color = ['full_message', colorama.Fore.YELLOW + colorama.Style.DIM]
-  error_color = ['full_message', colorama.Fore.MAGENTA + colorama.Style.BRIGHT]
-  marker_color = ['marker',  colorama.Fore.BLUE + colorama.Style.BRIGHT]
+  warning_color = ['full_message', ansi_colors.FOREGROUND_YELLOW + ansi_colors.STYLE_DIM]
+  error_color = ['full_message', ansi_colors.FOREGROUND_MAGENTA + ansi_colors.STYLE_BRIGHT]
+  marker_color = ['marker',  ansi_colors.FOREGROUND_BLUE + ansi_colors.STYLE_BRIGHT]
 
   def Colorize(line, regex, color):
     match = regex.match(line)
@@ -41,7 +36,7 @@ def ColorJavacOutput(output):
     end = match.end(color[0])
     return (line[:start]
             + color[1] + line[start:end]
-            + colorama.Fore.RESET + colorama.Style.RESET_ALL
+            + ansi_colors.FOREGROUND_RESET + ansi_colors.STYLE_RESET_ALL
             + line[end:])
 
   def ApplyColor(line):
@@ -158,8 +153,6 @@ def CreateManifest(manifest_path, classpath, main_class=None,
 
 
 def main(argv):
-  colorama.init()
-
   argv = build_utils.ExpandFileArgs(argv)
 
   parser = optparse.OptionParser()
