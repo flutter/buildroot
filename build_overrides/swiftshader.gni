@@ -6,4 +6,4 @@
 swiftshader_standalone = false
 
 # Path to SwiftShader.
-swiftshader_dir = "//third_party/swiftshader"
+swiftshader_dir = "//flutter/third_party/swiftshader"
