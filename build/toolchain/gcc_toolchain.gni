@@ -4,6 +4,7 @@
 
 import("//build/toolchain/clang.gni")
 import("//build/toolchain/clang_static_analyzer.gni")
+import("//build/toolchain/goma.gni")
 import("//build/toolchain/rbe.gni")
 
 # Path to the Clang static analysis wrapper script.
@@ -124,7 +125,7 @@ template("gcc_toolchain") {
     tool("cc") {
       depfile = "{{output}}.d"
       command = "$cc -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe) {
+      if (use_rbe || use_goma) {
         # The depfile generated on an RBE worker can contain absolute paths.
         # This sed command strips off the prefix, and rewrites to be
         # relative to the buildroot.
@@ -139,7 +140,7 @@ template("gcc_toolchain") {
     tool("cxx") {
       depfile = "{{output}}.d"
       command = "$cxx -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}  $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe) {
+      if (use_rbe || use_goma) {
         command += " && sed -i 's@/b/f/w@../..@g' $depfile"
       }
       depsformat = "gcc"
@@ -151,7 +152,7 @@ template("gcc_toolchain") {
     tool("asm") {
       depfile = "{{output}}.d"
       command = "$asm -MD -MF $depfile {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe) {
+      if (use_rbe || use_goma) {
         command += " && sed -i 's@/b/f/w@../..@g' $depfile"
       }
       depsformat = "gcc"
