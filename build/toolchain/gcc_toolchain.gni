@@ -122,6 +122,12 @@ template("gcc_toolchain") {
       coverage_flags = "-fprofile-instr-generate -fcoverage-mapping"
     }
 
+    if (host_os == "mac") {
+      sed_in_place_flag = "-i ''"
+    } else {
+      sed_in_place_flag = "-i"
+    }
+
     tool("cc") {
       depfile = "{{output}}.d"
       command = "$cc -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
@@ -129,7 +135,7 @@ template("gcc_toolchain") {
         # The depfile generated on an RBE worker can contain absolute paths.
         # This sed command strips off the prefix, and rewrites to be
         # relative to the buildroot.
-        command += " && sed -i 's@/b/f/w@../..@g' $depfile"
+        command += " && sed $sed_in_place_flag 's@/b/f/w@../..@g' $depfile"
       }
       depsformat = "gcc"
       description = "CC {{output}}"
@@ -141,7 +147,7 @@ template("gcc_toolchain") {
       depfile = "{{output}}.d"
       command = "$cxx -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}  $coverage_flags -c {{source}} -o {{output}}"
       if (use_rbe || use_goma) {
-        command += " && sed -i 's@/b/f/w@../..@g' $depfile"
+        command += " && sed $sed_in_place_flag 's@/b/f/w@../..@g' $depfile"
       }
       depsformat = "gcc"
       description = "CXX {{output}}"
@@ -153,7 +159,7 @@ template("gcc_toolchain") {
       depfile = "{{output}}.d"
       command = "$asm -MD -MF $depfile {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
       if (use_rbe || use_goma) {
-        command += " && sed -i 's@/b/f/w@../..@g' $depfile"
+        command += " && sed $sed_in_place_flag 's@/b/f/w@../..@g' $depfile"
       }
       depsformat = "gcc"
       description = "ASM {{output}}"
