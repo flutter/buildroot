@@ -12,6 +12,13 @@ analyzer_wrapper =
     rebase_path("//build/toolchain/clang_static_analyzer_wrapper.py",
                 root_build_dir) + " --mode=clang"
 
+# Flag passed to sed to edit files in place
+if (host_os == "mac") {
+  sed_in_place_flag = "-i ''"
+} else {
+  sed_in_place_flag = "-i"
+}
+
 # This template defines a toolchain for something that works like gcc
 # (including clang).
 #
@@ -120,12 +127,6 @@ template("gcc_toolchain") {
     coverage_flags = ""
     if (enable_coverage) {
       coverage_flags = "-fprofile-instr-generate -fcoverage-mapping"
-    }
-
-    if (host_os == "mac") {
-      sed_in_place_flag = "-i ''"
-    } else {
-      sed_in_place_flag = "-i"
     }
 
     tool("cc") {
