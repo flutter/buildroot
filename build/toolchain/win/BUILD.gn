@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/toolchain/rbe.gni")
+
 default_clang_base_path = "//buildtools/windows-x64/clang"
 
 declare_args() {
@@ -45,9 +47,17 @@ if (vc_bin_dir == "") {
 }
 
 if (use_goma) {
-  goma_prefix = "$goma_dir/gomacc.exe "
+  compiler_prefix = "$goma_dir/gomacc.exe "
+  asm_prefix = "$goma_dir/gomacc.exe "
+} else if (use_rbe) {
+  compiler_args = rewrapper_command + [
+    "--labels=type=compile,compiler=clang-cl,lang=cpp ",
+  ]
+  compiler_prefix = string_join(" ", compiler_args)
+  asm_prefix = " "
 } else {
-  goma_prefix = ""
+  compiler_prefix = ""
+  asm_prefix = ""
 }
 
 if (current_toolchain == default_toolchain) {
@@ -82,6 +92,11 @@ template("msvc_toolchain") {
 
     env = invoker.environment
 
+    env_path = "$root_out_dir/$env"
+    print(env_path)
+    env_file = read_file(env_path, "string")
+    print(env_file)
+
     cl = invoker.cl
 
     # Make these apply to all tools below.
@@ -89,39 +104,28 @@ template("msvc_toolchain") {
     lib_dir_switch = "/LIBPATH:"
 
     tool("cc") {
-      rspfile = "{{output}}.rsp"
-
-      # TODO(brettw) enable this when GN support in the binary has been rolled.
-      #precompiled_header_type = "msvc"
       pdbname = "{{target_out_dir}}/{{target_output_name}}_c.pdb"
-      command = "ninja -t msvc -e $env -- $cl /nologo /showIncludes @$rspfile /c {{source}} /Fo{{output}} /Fd$pdbname"
+      command = "ninja -t msvc -e $env -- $cl /nologo /showIncludes {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} /c {{source}} /Fo{{output}} /Fd$pdbname"
       depsformat = "msvc"
       description = "CC {{output}}"
       outputs = [
         "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
       ]
-      rspfile_content = "{{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
     }
 
     tool("cxx") {
-      rspfile = "{{output}}.rsp"
-
-      # TODO(brettw) enable this when GN support in the binary has been rolled.
-      #precompiled_header_type = "msvc"
-
       # The PDB name needs to be different between C and C++ compiled files.
       pdbname = "{{target_out_dir}}/{{target_output_name}}_cc.pdb"
       flags = ""
       if (is_clang && invoker.current_cpu == "x86") {
         flags = "-m32"
       }
-      command = "ninja -t msvc -e $env -- $cl $flags /nologo /showIncludes @$rspfile /c {{source}} /Fo{{output}} /Fd$pdbname"
+      command = "ninja -t msvc -e $env -- $cl $flags /nologo /showIncludes {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} /c {{source}} /Fo{{output}} /Fd$pdbname"
       depsformat = "msvc"
       description = "CXX {{output}}"
       outputs = [
         "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
       ]
-      rspfile_content = "{{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
     }
 
     tool("rc") {
@@ -141,7 +145,7 @@ template("msvc_toolchain") {
       } else if (toolchain_args.current_cpu == "arm64") {
         is_msvc_assembler = false
         prefix = rebase_path("$clang_base_path/bin", root_build_dir)
-        ml = "${goma_prefix}${prefix}/clang-cl.exe --target=arm64-windows"
+        ml = "${compiler_prefix}${prefix}/clang-cl.exe --target=arm64-windows"
         x64 = ""
       } else {
         ml = "ml.exe"
@@ -252,22 +256,10 @@ template("msvc_toolchain") {
 template("win_toolchains") {
   assert(defined(invoker.toolchain_arch))
   toolchain_arch = invoker.toolchain_arch
-
-  msvc_toolchain(target_name) {
-    environment = "environment." + toolchain_arch
-    cl = "${goma_prefix}\"${vc_bin_dir}/cl.exe\""
-    toolchain_args = {
-      if (defined(invoker.toolchain_args)) {
-        forward_variables_from(invoker.toolchain_args, "*")
-      }
-      current_cpu = toolchain_arch
-      is_clang = false
-    }
-  }
   msvc_toolchain("clang_" + target_name) {
     environment = "environment." + toolchain_arch
     prefix = rebase_path("$clang_base_path/bin", root_build_dir)
-    cl = "${goma_prefix}$prefix/clang-cl.exe"
+    cl = "${compiler_prefix}$prefix/clang-cl.exe"
     toolchain_args = {
       if (defined(invoker.toolchain_args)) {
         forward_variables_from(invoker.toolchain_args, "*")
