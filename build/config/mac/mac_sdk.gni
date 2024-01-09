@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/toolchain/goma.gni")
+import("//build/toolchain/rbe.gni")
 
 declare_args() {
   # Minimum supported version of the Mac SDK.
@@ -20,11 +21,11 @@ declare_args() {
 
 if (mac_sdk_path == "") {
   find_sdk_args = []
-  if (use_goma && create_xcode_symlinks) {
+  if ((use_goma || use_rbe) && create_xcode_symlinks) {
     # RBE has a restriction that paths cannot come from outside the build root.
     find_sdk_args += [
       "--symlink",
-      rebase_path(root_gen_dir),
+      rebase_path("//flutter/prebuilts"),
     ]
   }
   find_sdk_args += [
