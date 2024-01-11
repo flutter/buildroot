@@ -224,6 +224,14 @@ template("_fuchsia_cc_source_library") {
     _deps += [ "../fidl:$dep" ]
   }
 
+  foreach(binding_dep, meta_json.fidl_binding_deps) {
+    # No need to check "binding_deps.binding_type" because we always
+    # generate both hlcpp and natural bindings.
+    foreach(dep, binding_dep.deps) {
+      _deps += [ "../fidl:$dep" ]
+    }
+  }
+
   source_set(target_name) {
     output_name = _output_name
     public = _public_headers
