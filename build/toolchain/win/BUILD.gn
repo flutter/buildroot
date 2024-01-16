@@ -18,6 +18,7 @@ declare_args() {
 
 import("//build/config/win/visual_studio_version.gni")
 import("//build/toolchain/goma.gni")
+import("//build/toolchain/win/win_toolchain_data.gni")
 
 # Should only be running on Windows.
 assert(is_win)
@@ -30,19 +31,6 @@ assert(is_win)
 
 # This tool will is used as a wrapper for various commands below.
 tool_wrapper_path = rebase_path("tool_wrapper.py", root_build_dir)
-
-toolchain_data = exec_script("setup_toolchain.py",
-                             [
-                               visual_studio_path,
-                               windows_sdk_path,
-                               visual_studio_runtime_dirs,
-                               current_cpu,
-                             ],
-                             "scope")
-
-if (vc_bin_dir == "") {
-  vc_bin_dir = toolchain_data.vc_bin_dir
-}
 
 if (use_goma) {
   goma_prefix = "$goma_dir/gomacc.exe "
@@ -80,6 +68,12 @@ template("msvc_toolchain") {
       }
     }
 
+    if (defined(toolchain_args.is_clang)) {
+      toolchain_is_clang = toolchain_args.is_clang
+    } else {
+      toolchain_is_clang = is_clang
+    }
+
     env = invoker.environment
 
     cl = invoker.cl
@@ -88,40 +82,57 @@ template("msvc_toolchain") {
     lib_switch = ""
     lib_dir_switch = "/LIBPATH:"
 
-    tool("cc") {
-      rspfile = "{{output}}.rsp"
+    # If possible, pass system includes as flags to the compiler.  When that's
+    # not possible, load a full environment file (containing %INCLUDE% and
+    # %PATH%) -- e.g. 32-bit MSVS builds require %PATH% to be set and just
+    # passing in a list of include directories isn't enough.
+    if (defined(invoker.sys_include_flags)) {
+      assert(toolchain_is_clang)
+      env_wrapper = ""
+      sys_include_flags =
+          "${invoker.sys_include_flags} "  # Note trailing space.
+    } else {
+      # clang-cl doesn't need this env hoop, so omit it there.
+      assert(!toolchain_is_clang)
+      env_wrapper = "ninja -t msvc -e $env -- "  # Note trailing space.
+      sys_include_flags = ""
+    }
 
-      # TODO(brettw) enable this when GN support in the binary has been rolled.
-      #precompiled_header_type = "msvc"
-      pdbname = "{{target_out_dir}}/{{target_output_name}}_c.pdb"
-      command = "ninja -t msvc -e $env -- $cl /nologo /showIncludes @$rspfile /c {{source}} /Fo{{output}} /Fd$pdbname"
+    tool("cc") {
+      precompiled_header_type = "msvc"
+      pdbname = "{{target_out_dir}}/{{label_name}}_c.pdb"
+
+      # Label names may have spaces in them so the pdbname must be quoted. The
+      # source and output don't need to be quoted because GN knows they're a
+      # full file name and will quote automatically when necessary.
       depsformat = "msvc"
       description = "CC {{output}}"
-      outputs = [
-        "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
-      ]
-      rspfile_content = "{{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
+      outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj" ]
+
+      # Note that the code coverage wrapper scripts assumes that {{source}}
+      # comes immediately after /c.
+      command = "$env_wrapper$cl /c {{source}} /nologo /showIncludes:user $sys_include_flags{{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} /Fo{{output}} /Fd\"$pdbname\""
     }
 
     tool("cxx") {
-      rspfile = "{{output}}.rsp"
-
-      # TODO(brettw) enable this when GN support in the binary has been rolled.
-      #precompiled_header_type = "msvc"
+      precompiled_header_type = "msvc"
 
       # The PDB name needs to be different between C and C++ compiled files.
-      pdbname = "{{target_out_dir}}/{{target_output_name}}_cc.pdb"
+      pdbname = "{{target_out_dir}}/{{label_name}}_cc.pdb"
+
       flags = ""
       if (is_clang && invoker.current_cpu == "x86") {
         flags = "-m32"
       }
-      command = "ninja -t msvc -e $env -- $cl $flags /nologo /showIncludes @$rspfile /c {{source}} /Fo{{output}} /Fd$pdbname"
+
+      # See comment in CC tool about quoting.
       depsformat = "msvc"
       description = "CXX {{output}}"
-      outputs = [
-        "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
-      ]
-      rspfile_content = "{{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
+      outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj" ]
+
+      # Note that the code coverage wrapper scripts assumes that {{source}}
+      # comes immediately after /c.
+      command = "$env_wrapper$cl /c {{source}} /Fo{{output}} $flags /nologo /showIncludes:user $sys_include_flags{{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} /Fd\"$pdbname\""
     }
 
     tool("rc") {
@@ -175,14 +186,11 @@ template("msvc_toolchain") {
     }
 
     tool("solink") {
-      dllname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"  # e.g.
-                                                                               # foo.dll
-      libname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}.lib"  # e.g.
-                                                                                   # foo.dll.lib
-      expname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}.exp"  # e.g.
-                                                                                   # foo.dll.exp
-      pdbname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}.pdb"  # e.g.
-                                                                                   # foo.dll.pdb
+      # E.g. "foo.dll":
+      dllname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
+      libname = "${dllname}.lib"  # e.g. foo.dll.lib
+      expname = "${dllname}.exp"
+      pdbname = "${dllname}.pdb"
       rspfile = "${dllname}.rsp"
 
       link_command = "$python_path $tool_wrapper_path link-wrapper $env False link.exe /nologo /IMPLIB:$libname /DLL /OUT:$dllname /PDB:${dllname}.pdb @$rspfile"
@@ -253,9 +261,20 @@ template("win_toolchains") {
   assert(defined(invoker.toolchain_arch))
   toolchain_arch = invoker.toolchain_arch
 
+  # The toolchain data for `msvc_toolchain()`.
+  if (toolchain_arch == "x86") {
+    win_toolchain_data = win_toolchain_data_x86
+  } else if (toolchain_arch == "x64") {
+    win_toolchain_data = win_toolchain_data_x64
+  } else if (toolchain_arch == "arm64") {
+    win_toolchain_data = win_toolchain_data_arm64
+  } else {
+    error("Unsupported toolchain_arch, add it to win_toolchain_data.gni")
+  }
+
   msvc_toolchain(target_name) {
     environment = "environment." + toolchain_arch
-    cl = "${goma_prefix}\"${vc_bin_dir}/cl.exe\""
+    cl = "${goma_prefix}\"${win_toolchain_data.vc_bin_dir}/cl.exe\""
     toolchain_args = {
       if (defined(invoker.toolchain_args)) {
         forward_variables_from(invoker.toolchain_args, "*")
@@ -268,6 +287,9 @@ template("win_toolchains") {
     environment = "environment." + toolchain_arch
     prefix = rebase_path("$clang_base_path/bin", root_build_dir)
     cl = "${goma_prefix}$prefix/clang-cl.exe"
+
+    sys_include_flags = "${win_toolchain_data.include_flags_imsvc}"
+
     toolchain_args = {
       if (defined(invoker.toolchain_args)) {
         forward_variables_from(invoker.toolchain_args, "*")
