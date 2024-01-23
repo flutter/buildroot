@@ -94,10 +94,7 @@ template("mac_toolchain") {
 
     tool("cc") {
       depfile = "{{output}}.d"
-      command = "$cc -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        command += " && sed -i '' -e 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$cc -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "CC {{output}}"
       outputs =
@@ -106,10 +103,7 @@ template("mac_toolchain") {
 
     tool("cxx") {
       depfile = "{{output}}.d"
-      command = "$cxx -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        command += " && sed -i '' -e 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$cxx -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "CXX {{output}}"
       outputs =
@@ -118,10 +112,7 @@ template("mac_toolchain") {
 
     tool("asm") {
       depfile = "{{output}}.d"
-      command = "$asm -MD -MF $depfile {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} $sysroot_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        command += " && sed -i '' -e 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$asm -MMD -MF $depfile {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} $sysroot_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "ASM {{output}}"
       outputs =
@@ -130,10 +121,7 @@ template("mac_toolchain") {
 
     tool("objc") {
       depfile = "{{output}}.d"
-      command = "$objc -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} {{cflags_objc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        command += " && sed -i '' -e 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$objc -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} {{cflags_objc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "OBJC {{output}}"
       outputs =
@@ -142,10 +130,7 @@ template("mac_toolchain") {
 
     tool("objcxx") {
       depfile = "{{output}}.d"
-      command = "$objc -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} {{cflags_objcc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        command += " && sed -i '' -e 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$objc -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} {{cflags_objcc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "OBJCXX {{output}}"
       outputs =

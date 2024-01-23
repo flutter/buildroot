@@ -12,13 +12,6 @@ analyzer_wrapper =
     rebase_path("//build/toolchain/clang_static_analyzer_wrapper.py",
                 root_build_dir) + " --mode=clang"
 
-# Flag passed to sed to edit files in place
-if (host_os == "mac") {
-  sed_in_place_flag = "-i ''"
-} else {
-  sed_in_place_flag = "-i"
-}
-
 # This template defines a toolchain for something that works like gcc
 # (including clang).
 #
@@ -131,13 +124,7 @@ template("gcc_toolchain") {
 
     tool("cc") {
       depfile = "{{output}}.d"
-      command = "$cc -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        # The depfile generated on an RBE worker can contain absolute paths.
-        # This sed command strips off the prefix, and rewrites to be
-        # relative to the buildroot.
-        command += " && sed $sed_in_place_flag 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$cc -MMD -MF$depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "CC {{output}}"
       outputs =
@@ -146,10 +133,7 @@ template("gcc_toolchain") {
 
     tool("cxx") {
       depfile = "{{output}}.d"
-      command = "$cxx -MD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}  $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        command += " && sed $sed_in_place_flag 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$cxx -MMD -MF$depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}  $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "CXX {{output}}"
       outputs =
@@ -158,10 +142,7 @@ template("gcc_toolchain") {
 
     tool("asm") {
       depfile = "{{output}}.d"
-      command = "$asm -MD -MF $depfile {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
-      if (use_rbe || use_goma) {
-        command += " && sed $sed_in_place_flag 's@/b/f/w@../..@g' $depfile"
-      }
+      command = "$asm -MMD -MF$depfile {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
       description = "ASM {{output}}"
       outputs =
