@@ -41,10 +41,7 @@ def main():
   parser.add_argument('--root', dest='root', action='store', required=True)
   parser.add_argument('--json', dest='json', action='store', required=True)
   parser.add_argument('--fidlgen-output-root', dest='fidlgen_output_root', action='store', required=False)
-  parser.add_argument('--output-c-tables', dest='output_c_tables', action='store', required=True)
   parser.add_argument('--target-api-level', dest='target_api_level', action='store', required=False)
-  # TODO(fxbug.dev/39388): Remove after https://fxrev.dev/953989 rolls into flutter.
-  parser.add_argument('--new-tables-path', dest='new_tables_path', action='store', required=False)
 
   args = parser.parse_args()
 
@@ -54,8 +51,6 @@ def main():
 
   fidlc_command = [
     args.fidlc_bin,
-    '--tables',
-    args.output_c_tables,
     '--json',
     args.json
   ]
@@ -79,13 +74,6 @@ def main():
       fidlc_command.append(fidl_abspath)
 
   subprocess.check_call(fidlc_command)
-
-  # TODO(fxbug.dev/39388): Remove after https://fxrev.dev/953989 rolls into flutter.
-  if args.fidlgen_bin:
-    # Write tables.c so that GN doesn't complain about a missing output before the roll.
-    assert args.new_tables_path
-    with open(args.new_tables_path, "w") as f:
-      print("// This will contain coding tables once https://fxbug.dev/39388 is done.", file=f)
 
   if args.fidlgen_output_root:
     assert os.path.exists(args.json)
