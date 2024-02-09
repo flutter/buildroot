@@ -30,7 +30,7 @@ import sys
 from gn_helpers import ToGNString
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-json_data_file = os.path.join(script_dir, 'win_toolchain.json')
+json_data_file = os.path.join(script_dir, 'new_win_toolchain.json')
 
 sys.path.insert(0, os.path.join(script_dir))
 
@@ -496,6 +496,7 @@ def Update(force=False, no_download=False):
                     'win_toolchain',
                     'get_toolchain_if_necessary.py'),
         '--output-json', json_data_file,
+        '--toolchain-dir', os.path.join(depot_tools_path, 'win_toolchain'),
       ] + _GetDesiredVsToolchainHashes()
     if force:
       get_toolchain_args.append('--force')
