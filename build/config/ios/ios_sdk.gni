@@ -56,7 +56,6 @@ if (ios_sdk_path == "") {
     ios_simulator_sdk_path = _ios_sim_sdk_result[0]
   }
 
-  # Compute default target.
   if (use_ios_simulator) {
     assert(ios_simulator_sdk_path != "")
     ios_sdk_path = ios_simulator_sdk_path
