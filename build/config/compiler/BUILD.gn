@@ -534,8 +534,8 @@ config("runtime_library") {
       ldflags += [ "-nostdlib++" ]
     }
     include_dirs = [
-      "//third_party/libcxx/include",
-      "//third_party/libcxxabi/include",
+      "//flutter/third_party/libcxx/include",
+      "//flutter/third_party/libcxxabi/include",
     ]
   }
 
@@ -549,9 +549,7 @@ config("runtime_library") {
 
     ldflags += [ "-nostdlib" ]
 
-    ldflags += [
-      "-Wl,--warn-shared-textrel",
-    ]
+    ldflags += [ "-Wl,--warn-shared-textrel" ]
 
     libs += [
       "c",
@@ -1018,6 +1016,7 @@ config("prevent_unsafe_narrowing") {
       "-Wimplicit-int-conversion",
       "-Wsign-compare",
       "-Wsign-conversion",
+
       # Avoid bugs of the form `if (size_t i = size; i >= 0; --i)` while
       # fixing types to be sign-correct.
       "-Wtautological-unsigned-zero-compare",
