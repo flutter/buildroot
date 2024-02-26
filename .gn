@@ -16,11 +16,12 @@ secondary_source = "//flutter/build/secondary/"
 # The set of targets known to pass 'gn check'. When all targets pass, remove
 # this.
 check_targets = [
-  "//dart/*",
-  "//flow/*",
-  "//flutter/*",
-  "//glue/*",
-  "//mojo/*",
-  "//skia/*",
-  "//sky/*",
+  "//flutter/common/*",
+  "//flutter/display_list/*",
+  "//flutter/flow/*",
+  "//flutter/fml/*",
+  "//flutter/lib/*",
+  "//flutter/impeller/*",
+  "//flutter/runtime/*",
+  "//flutter/shell/*",
 ]
