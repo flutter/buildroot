@@ -41,7 +41,7 @@ toolchain("x86_newlib") {
 
   if (is_win) {
     tool("stamp") {
-      command = "$python_path gyp-win-tool stamp \$out"
+      command = "\"$python_path\" gyp-win-tool stamp \$out"
       description = "STAMP \$out"
     }
   } else {
