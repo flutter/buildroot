@@ -148,7 +148,7 @@ template("msvc_toolchain") {
     }
 
     tool("rc") {
-      command = "$python_path $tool_wrapper_path rc-wrapper $env rc.exe /nologo {{defines}} {{include_dirs}} /fo{{output}} {{source}}"
+      command = "\"$python_path\" $tool_wrapper_path rc-wrapper $env rc.exe /nologo {{defines}} {{include_dirs}} /fo{{output}} {{source}}"
       depsformat = "msvc"
       outputs = [
         "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.res",
@@ -170,7 +170,7 @@ template("msvc_toolchain") {
         ml = "ml.exe"
         x64 = ""
       }
-      command = "$python_path $tool_wrapper_path asm-wrapper $env $ml $x64 {{defines}} {{include_dirs}} {{asmflags}} "
+      command = "\"$python_path\" $tool_wrapper_path asm-wrapper $env $ml $x64 {{defines}} {{include_dirs}} {{asmflags}} "
       if (is_msvc_assembler) {
         command += "-c -o{{output}} {{source}}"
       } else {
@@ -183,7 +183,7 @@ template("msvc_toolchain") {
 
     tool("alink") {
       rspfile = "{{output}}.rsp"
-      command = "$python_path $tool_wrapper_path link-wrapper $env False lib.exe /nologo /ignore:4221 /OUT:{{output}} @$rspfile"
+      command = "\"$python_path\" $tool_wrapper_path link-wrapper $env False lib.exe /nologo /ignore:4221 /OUT:{{output}} @$rspfile"
       description = "LIB {{output}}"
       outputs = [
         # Ignore {{output_extension}} and always use .lib, there's no reason to
@@ -205,10 +205,10 @@ template("msvc_toolchain") {
       pdbname = "${dllname}.pdb"
       rspfile = "${dllname}.rsp"
 
-      link_command = "$python_path $tool_wrapper_path link-wrapper $env False link.exe /nologo /IMPLIB:$libname /DLL /OUT:$dllname /PDB:${dllname}.pdb @$rspfile"
+      link_command = "\"$python_path\" $tool_wrapper_path link-wrapper $env False link.exe /nologo /IMPLIB:$libname /DLL /OUT:$dllname /PDB:${dllname}.pdb @$rspfile"
 
       # TODO(brettw) support manifests
-      #manifest_command = "$python_path $tool_wrapper_path manifest-wrapper $env mt.exe -nologo -manifest $manifests -out:${dllname}.manifest"
+      #manifest_command = "\"$python_path\" $tool_wrapper_path manifest-wrapper $env mt.exe -nologo -manifest $manifests -out:${dllname}.manifest"
       #command = "cmd /c $link_command && $manifest_command"
       command = link_command
 
@@ -236,10 +236,10 @@ template("msvc_toolchain") {
       rspfile = "$binary_output.rsp"
       pdbfile = "$binary_output.pdb"
 
-      link_command = "$python_path $tool_wrapper_path link-wrapper $env False link.exe /nologo /OUT:$binary_output /PDB:$pdbfile @$rspfile"
+      link_command = "\"$python_path\" $tool_wrapper_path link-wrapper $env False link.exe /nologo /OUT:$binary_output /PDB:$pdbfile @$rspfile"
 
       # TODO(brettw) support manifests
-      #manifest_command = "$python_path $tool_wrapper_path manifest-wrapper $env mt.exe -nologo -manifest $manifests -out:{{output}}.manifest"
+      #manifest_command = "\"$python_path\" $tool_wrapper_path manifest-wrapper $env mt.exe -nologo -manifest $manifests -out:{{output}}.manifest"
       #command = "cmd /c $link_command && $manifest_command"
       command = link_command
 
@@ -263,7 +263,7 @@ template("msvc_toolchain") {
     }
 
     tool("copy") {
-      command = "$python_path $tool_wrapper_path recursive-mirror {{source}} {{output}}"
+      command = "\"$python_path\" $tool_wrapper_path recursive-mirror {{source}} {{output}}"
       description = "COPY {{source}} {{output}}"
     }
   }
