@@ -22,6 +22,9 @@ from optparse import OptionParser
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from pyutil.file_util import symlink
 
+PREBUILTS = os.path.realpath(os.path.join(
+  os.path.dirname(__file__), os.pardir, os.pardir, 'flutter', 'prebuilts',
+))
 
 def parse_version(version_str):
   """'10.6' => [10, 6]"""
@@ -30,20 +33,30 @@ def parse_version(version_str):
 
 def main():
   parser = OptionParser()
-  parser.add_option("--verify",
-                    action="store_true", dest="verify", default=False,
-                    help="return the sdk argument and warn if it doesn't exist")
-  parser.add_option("--sdk_path",
-                    action="store", type="string", dest="sdk_path", default="",
-                    help="user-specified SDK path; bypasses verification")
   parser.add_option("--print_sdk_path",
                     action="store_true", dest="print_sdk_path", default=False,
                     help="Additionaly print the path the SDK (appears first).")
+  parser.add_option("--as-gclient-hook",
+                    action="store_true", dest="as_gclient_hook", default=False,
+                    help="Whether the script is running as a gclient hook.")
   parser.add_option("--symlink",
-                    action="store", type="string", dest="symlink", default="",
+                    action="store", type="string", dest="symlink",
                     help="Whether to create a symlink in the buildroot to the SDK.")
   (options, args) = parser.parse_args()
   min_sdk_version = args[0]
+
+  # On CI, Xcode is not yet installed when gclient hooks are being run.
+  # This is because the version of Xcode that CI installs might depend on the
+  # contents of the repo, so the repo must be set up first, which includes
+  # running the gclient hooks. Instead, on CI, this script will be run during
+  # GN.
+  running_on_luci = os.environ.get('LUCI_CONTEXT') is not None
+  if running_on_luci and options.as_gclient_hook:
+    return 0
+
+  symlink_path = options.symlink
+  if not running_on_luci and symlink_path is None:
+    symlink_path = PREBUILTS
 
   job = subprocess.Popen(['xcode-select', '-print-path'],
                          universal_newlines=True,
@@ -82,29 +95,13 @@ def main():
     print(sdk_json_output)
     raise Exception('No %s+ SDK found' % min_sdk_version)
 
-  if options.verify and best_sdk != min_sdk_version and not options.sdk_path:
-    print(sdk_json_output)
-    sys.stderr.writelines([
-      '',
-      '                                           vvvvvvv',
-      '',
-      'This build requires the %s SDK, but it was not found on your system.' \
-        % min_sdk_version,
-      'Either install it, or explicitly set mac_sdk in your gn args.',
-      '',
-      '                                           ^^^^^^^',
-      ''])
-    return min_sdk_version
+  if symlink_path:
+    sdks_path = os.path.join(symlink_path, 'SDKs')
+    symlink_target = os.path.join(sdks_path, os.path.basename(sdk_output))
+    symlink(sdk_output, symlink_target)
+    sdk_output = symlink_target
 
-  if options.symlink or options.print_sdk_path:
-    if options.symlink:
-      symlink_target = os.path.join(options.symlink, 'SDKs', os.path.basename(sdk_output))
-      symlink(sdk_output, symlink_target)
-      sdk_output = symlink_target
-
-    if options.print_sdk_path:
-      print(sdk_output)
-
+  print(sdk_output)
   return best_sdk
 
 
