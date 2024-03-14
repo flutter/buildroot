@@ -4,6 +4,7 @@
 
 import("//build/config/c++/c++.gni")
 import("//build/config/sanitizers/sanitizers.gni")
+import("//build/toolchain/toolchain.gni")
 
 # Contains the dependencies needed for sanitizers to link into executables and
 # shared_libraries. Unconditionally depend upon this target as it is empty if
@@ -14,7 +15,7 @@ group("deps") {
     deps += [ ":options_sources" ]
   }
   if (use_custom_libcxx) {
-    deps += [ "//buildtools/third_party/libc++:libcxx_proxy" ]
+    deps += [ "$buildtools_path/third_party/libc++:libcxx_proxy" ]
   }
 }
 

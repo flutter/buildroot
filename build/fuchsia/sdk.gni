@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/fuchsia/config.gni")
+import("//build/toolchain/toolchain.gni")
 
 declare_args() {
   # The path to where GN targets derived from the Fuchsia SDK are instantiated.
@@ -17,7 +18,7 @@ declare_args() {
 
   # The following variables are Flutter buildroot specific.
   fuchsia_sdk_path = "//fuchsia/sdk/$host_os"
-  fuchsia_toolchain_path = "//buildtools/${host_os}-${host_cpu}/clang"
+  fuchsia_toolchain_path = "$buildtools_path/${host_os}-${host_cpu}/clang"
 }
 
 declare_args() {
