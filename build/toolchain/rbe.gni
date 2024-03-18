@@ -4,6 +4,8 @@
 
 # Defines the configuration of RBE.
 
+import("//build/toolchain/toolchain.gni")
+
 declare_args() {
   # Set to true to enable distributed compilation using Goma.
   use_rbe = false
@@ -31,7 +33,7 @@ declare_args() {
 
   rbe_platform = ""
 
-  rbe_dir = rebase_path("//buildtools/linux-x64/reclient")
+  rbe_dir = rebase_path("$buildtools_path/linux-x64/reclient")
 
   rbe_cfg = rebase_path("//flutter/build/rbe/rewrapper-linux.cfg")
 }

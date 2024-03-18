@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/toolchain/clang.gni")
+import("//build/toolchain/toolchain.gni")
 import("clang.gni")
 
 # Empty entry to satisfy ANGLE build, which tries to remove this config.
@@ -26,10 +27,10 @@ config("extra_warnings") {
 
 group("llvm-symbolizer_data") {
   if (is_win) {
-    data = [ "//buildtools/windows-x64/bin/llvm-symbolizer.exe" ]
+    data = [ "$buildtools_path/windows-x64/bin/llvm-symbolizer.exe" ]
   } else if (is_mac) {
-    data = [ "//buildtools/mac-${host_cpu}/clang/bin/llvm-symbolizer" ]
+    data = [ "$buildtools_path/mac-${host_cpu}/clang/bin/llvm-symbolizer" ]
   } else if (is_linux) {
-    data = [ "//buildtools/linux-${host_cpu}/clang/bin/llvm-symbolizer" ]
+    data = [ "$buildtools_path/linux-${host_cpu}/clang/bin/llvm-symbolizer" ]
   }
 }

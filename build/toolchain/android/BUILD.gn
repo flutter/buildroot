@@ -8,6 +8,7 @@ import("//build/toolchain/clang.gni")
 import("//build/toolchain/gcc_toolchain.gni")
 import("//build/toolchain/goma.gni")
 import("//build/toolchain/rbe.gni")
+import("//build/toolchain/toolchain.gni")
 
 # The Android GCC toolchains share most of the same parameters, so we have this
 # wrapper around gcc_toolchain to avoid duplication of logic.
@@ -69,7 +70,7 @@ template("android_toolchain") {
       assert(false, "Unknown host")
     }
 
-    prefix = rebase_path("//buildtools/$host_dir/clang/bin", root_build_dir)
+    prefix = rebase_path("$buildtools_path/$host_dir/clang/bin", root_build_dir)
 
     cc = "${compiler_prefix}${prefix}/clang"
     cxx = "${compiler_prefix}${prefix}/clang++"
