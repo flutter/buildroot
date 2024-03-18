@@ -422,6 +422,12 @@ config("compiler") {
     }
   }
 
+  # Fuchsia-specific flags setup.
+  # -----------------------------
+  if (is_fuchsia) {
+    configs = ["//flutter/tools/fuchsia/gn-sdk/src/config:compiler"]
+  }
+
   asmflags = cflags
 }
 
@@ -571,6 +577,11 @@ config("runtime_library") {
       ldflags += [ "-stdlib=libstdc++" ]
       libs += [ "gcc" ]
     }
+  }
+
+  # Fuchsia standard library setup.
+  if (is_fuchsia) {
+    configs = ["//flutter/tools/fuchsia/gn-sdk/src/config:runtime_library"]
   }
 }
 
