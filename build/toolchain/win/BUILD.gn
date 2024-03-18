@@ -3,9 +3,10 @@
 # found in the LICENSE file.
 
 import("//build/toolchain/rbe.gni")
+import("//build/toolchain/toolchain.gni")
 import("//build/toolchain/win/win_toolchain_data.gni")
 
-default_clang_base_path = "//buildtools/windows-x64/clang"
+default_clang_base_path = "$buildtools_path/windows-x64/clang"
 
 declare_args() {
   # Path to the directory containing the VC binaries for the right
