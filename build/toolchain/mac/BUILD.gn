@@ -11,14 +11,15 @@ import("//build/toolchain/clang.gni")
 import("//build/toolchain/clang_static_analyzer.gni")
 import("//build/toolchain/goma.gni")
 import("//build/toolchain/rbe.gni")
+import("//build/toolchain/toolchain.gni")
 
 # Goma doesn't support the host-arm64 toolchain, so continue using Rosetta.
 if (host_cpu == "arm64" && !use_goma) {
   rebased_clang_dir =
-      rebase_path("//buildtools/mac-arm64/clang/bin", root_build_dir)
+      rebase_path("$buildtools_path/mac-arm64/clang/bin", root_build_dir)
 } else {
   rebased_clang_dir =
-      rebase_path("//buildtools/mac-x64/clang/bin", root_build_dir)
+      rebase_path("$buildtools_path/mac-x64/clang/bin", root_build_dir)
 }
 
 if (use_goma) {

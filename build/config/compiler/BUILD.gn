@@ -17,9 +17,9 @@ if (is_win) {
 import("//build/config/c++/c++.gni")
 import("//build/config/profiler.gni")
 import("//build/config/sanitizers/sanitizers.gni")
-import("//build/fuchsia/config.gni")
 import("//build/toolchain/ccache.gni")
 import("//build/toolchain/clang.gni")
+import("//build/toolchain/toolchain.gni")
 import("//build/toolchain/wasm.gni")
 
 declare_args() {
@@ -152,8 +152,8 @@ config("compiler") {
     if (use_custom_libcxx) {
       cflags_cc += [ "-nostdinc++" ]
       include_dirs = [
-        "//buildtools/third_party/libc++/trunk/include",
-        "//buildtools/third_party/libc++abi/trunk/include",
+        "$buildtools_path/third_party/libc++/trunk/include",
+        "$buildtools_path/third_party/libc++abi/trunk/include",
       ]
     }
   }
@@ -426,9 +426,7 @@ config("compiler") {
   # Fuchsia-specific flags setup.
   # -----------------------------
   if (is_fuchsia) {
-    if (fuchsia_target_api_level != -1) {
-      cflags += [ "-ffuchsia-api-level=${fuchsia_target_api_level}" ]
-    }
+    configs = ["//flutter/tools/fuchsia/gn-sdk/src/config:compiler"]
   }
 
   asmflags = cflags
@@ -580,6 +578,11 @@ config("runtime_library") {
       ldflags += [ "-stdlib=libstdc++" ]
       libs += [ "gcc" ]
     }
+  }
+
+  # Fuchsia standard library setup.
+  if (is_fuchsia) {
+    configs = ["//flutter/tools/fuchsia/gn-sdk/src/config:runtime_library"]
   }
 }
 
