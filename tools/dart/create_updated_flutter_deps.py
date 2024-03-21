@@ -15,6 +15,7 @@ import os
 import sys
 
 DART_SCRIPT_DIR = os.path.dirname(sys.argv[0])
+OLD_DART_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../third_party/dart'))
 DART_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../flutter/third_party/dart'))
 FLUTTER_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../flutter'))
 
@@ -65,6 +66,8 @@ def ParseArgs(args):
 
 def Main(argv):
   args = ParseArgs(argv)
+  if args.dart_deps == DART_ROOT and not os.path.isfile(DART_ROOT):
+    args.dart_deps = OLD_DART_ROOT
   (new_vars, new_deps) = ParseDepsFile(args.dart_deps)
   (old_vars, old_deps) = ParseDepsFile(args.flutter_deps)
 
@@ -104,7 +107,8 @@ def Main(argv):
       while i < len(lines) and (lines[i].startswith("  # WARNING: end of dart dependencies") == 0):
         i = i + 1
       for (k, v) in sorted(old_deps.items()):
-        if (k.startswith('src/flutter/third_party/dart/')):
+        if (k.startswith('src/flutter/third_party/dart/') or
+            k.startswith('src/third_party/dart/')):
           for (dart_k, dart_v) in (list(new_deps.items())):
             dart_k_suffix = dart_k[len('sdk/') if dart_k.startswith('sdk/') else 0:]
             if (k.endswith(dart_k_suffix)):
