@@ -15,8 +15,9 @@ import os
 import sys
 
 DART_SCRIPT_DIR = os.path.dirname(sys.argv[0])
-DART_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../third_party/dart'))
-FLUTTER_ROOT = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../flutter'))
+OLD_DART_DEPS = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../third_party/dart/DEPS'))
+DART_DEPS = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../flutter/third_party/dart/DEPS'))
+FLUTTER_DEPS = os.path.realpath(os.path.join(DART_SCRIPT_DIR, '../../flutter/DEPS'))
 
 class VarImpl(object):
   def __init__(self, local_scope):
@@ -56,15 +57,17 @@ def ParseArgs(args):
   parser.add_argument('--dart_deps', '-d',
       type=str,
       help='Dart DEPS file.',
-      default=os.path.join(DART_ROOT, 'DEPS'))
+      default=DART_DEPS)
   parser.add_argument('--flutter_deps', '-f',
       type=str,
       help='Flutter DEPS file.',
-      default=os.path.join(FLUTTER_ROOT, 'DEPS'))
+      default=FLUTTER_DEPS)
   return parser.parse_args(args)
 
 def Main(argv):
   args = ParseArgs(argv)
+  if args.dart_deps == DART_DEPS and not os.path.isfile(DART_DEPS):
+    args.dart_deps = OLD_DART_DEPS
   (new_vars, new_deps) = ParseDepsFile(args.dart_deps)
   (old_vars, old_deps) = ParseDepsFile(args.flutter_deps)
 
@@ -104,7 +107,8 @@ def Main(argv):
       while i < len(lines) and (lines[i].startswith("  # WARNING: end of dart dependencies") == 0):
         i = i + 1
       for (k, v) in sorted(old_deps.items()):
-        if (k.startswith('src/third_party/dart/')):
+        if (k.startswith('src/flutter/third_party/dart/') or
+            k.startswith('src/third_party/dart/')):
           for (dart_k, dart_v) in (list(new_deps.items())):
             dart_k_suffix = dart_k[len('sdk/') if dart_k.startswith('sdk/') else 0:]
             if (k.endswith(dart_k_suffix)):
