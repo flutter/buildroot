@@ -101,11 +101,13 @@ def main():
     symlink(sdk_output, symlink_target)
     sdk_output = symlink_target
 
-  print(sdk_output)
-  return best_sdk
+  if not options.as_gclient_hook:
+    print(sdk_output)
+    print(best_sdk)
+  return 0
 
 
 if __name__ == '__main__':
   if sys.platform != 'darwin':
     raise Exception("This script only runs on Mac")
-  print((main()))
+  sys.exit((main()))

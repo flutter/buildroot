@@ -84,7 +84,8 @@ def main(argv):
       frameworks_symlink = os.path.join(libraries_path, 'Frameworks')
       symlink(frameworks_location, frameworks_symlink)
       sdk_output = symlink_target
-    print(sdk_output)
+    if not args.as_gclient_hook:
+      print(sdk_output)
   return 0
 
 
