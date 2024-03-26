@@ -28,11 +28,11 @@ if (use_goma) {
   objc_prefix = "$goma_dir/gomacc "
   link_prefix = "$goma_dir/gomacc "
 } else if (use_rbe) {
+  remote_wrapper =
+      rebase_path("//flutter/build/rbe/remote_wrapper.sh", root_build_dir)
   compiler_args = rewrapper_command + [
+    "--remote_wrapper=$remote_wrapper",
     "--labels=type=compile,compiler=clang,lang=cpp ",
-  ]
-  link_args = rewrapper_command + [
-    "--labels=type=link,tool=clang ",
   ]
   cxx_prefix = string_join(" ", compiler_args)
   # RBE does not support objc out of the box.
