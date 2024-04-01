@@ -4,12 +4,21 @@
 
 import("//build/toolchain/clang.gni")
 import("//build/toolchain/goma.gni")
+import("//build/toolchain/rbe.gni")
 import("//build/toolchain/toolchain.gni")
 
 if (use_goma) {
-  goma_prefix = "$goma_dir/gomacc "
+  assert(!use_rbe, "Goma and RBE can't be used together.")
+  compiler_prefix = "$goma_dir/gomacc "
+  link_prefix = "$goma_dir/gomacc "
+} else if (use_rbe) {
+  compiler_args =
+      rewrapper_command + [ "--labels=type=compile,compiler=clang,lang=cpp " ]
+  compiler_prefix = string_join(" ", compiler_args)
+  link_prefix = ""
 } else {
-  goma_prefix = ""
+  compiler_prefix = ""
+  link_prefix = ""
 }
 
 toolchain("fuchsia") {
@@ -49,7 +58,7 @@ toolchain("fuchsia") {
 
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "$goma_prefix $cc -MD -MF $depfile $target_triple_flags $sysroot_flags $lto_flags {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    command = "$compiler_prefix $cc -MD -MF $depfile $target_triple_flags $sysroot_flags $lto_flags {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CC {{output}}"
     outputs =
@@ -58,7 +67,7 @@ toolchain("fuchsia") {
 
   tool("cxx") {
     depfile = "{{output}}.d"
-    command = "$goma_prefix $cxx -MD -MF $depfile $target_triple_flags $sysroot_flags $lto_flags {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    command = "$compiler_prefix $cxx -MD -MF $depfile $target_triple_flags $sysroot_flags $lto_flags {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CXX {{output}}"
     outputs =
@@ -67,7 +76,7 @@ toolchain("fuchsia") {
 
   tool("asm") {
     depfile = "{{output}}.d"
-    command = "$goma_prefix $cc -MD -MF $depfile $target_triple_flags $sysroot_flags $lto_flags {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    command = "$cc -MD -MF $depfile $target_triple_flags $sysroot_flags $lto_flags {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "ASM {{output}}"
     outputs =
@@ -99,7 +108,7 @@ toolchain("fuchsia") {
     # existing .TOC file, overwrite it, otherwise, don't change it.
     tocfile = sofile + ".TOC"
     temporary_tocname = sofile + ".tmp"
-    link_command = "$goma_prefix $ld $target_triple_flags $sysroot_flags $lto_flags -shared {{ldflags}} -o $unstripped_sofile -Wl,--build-id=sha1 -Wl,-soname=$soname @$rspfile"
+    link_command = "$link_prefix $ld $target_triple_flags $sysroot_flags $lto_flags -shared {{ldflags}} -o $unstripped_sofile -Wl,--build-id=sha1 -Wl,-soname=$soname @$rspfile"
     toc_command = "{ $readelf -d $unstripped_sofile | grep SONAME ; $nm -gD -f p $unstripped_sofile | cut -f1-2 -d' '; } > $temporary_tocname"
     replace_command = "if ! cmp -s $temporary_tocname $tocfile; then mv $temporary_tocname $tocfile; fi"
     strip_command = "$strip -o $sofile $unstripped_sofile"
@@ -136,7 +145,7 @@ toolchain("fuchsia") {
     outfile = "{{root_out_dir}}/$exename"
     rspfile = "$outfile.rsp"
     unstripped_outfile = "{{root_out_dir}}/exe.unstripped/$exename"
-    command = "$goma_prefix $ld $target_triple_flags $sysroot_flags $lto_flags {{ldflags}} -o $unstripped_outfile -Wl,--build-id=sha1 -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}} && ${strip} -o $outfile $unstripped_outfile"
+    command = "$link_prefix $ld $target_triple_flags $sysroot_flags $lto_flags {{ldflags}} -o $unstripped_outfile -Wl,--build-id=sha1 -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}} && ${strip} -o $outfile $unstripped_outfile"
     description = "LINK $outfile"
     rspfile_content = "{{inputs}}"
     outputs = [
