@@ -532,8 +532,8 @@ config("runtime_library") {
       ldflags += [ "-nostdlib++" ]
     }
     include_dirs = [
-      "//third_party/libcxx/include",
-      "//third_party/libcxxabi/include",
+      "//flutter/third_party/libcxx/include",
+      "//flutter/third_party/libcxxabi/include",
     ]
   }
 
