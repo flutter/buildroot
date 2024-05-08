@@ -19,11 +19,17 @@ if (use_goma) {
   compiler_prefix = "$goma_dir/gomacc "
   link_prefix = "$goma_dir/gomacc "
 } else if (use_rbe) {
-  compiler_args =
-      rewrapper_command + [ "--labels=type=compile,compiler=clang,lang=cpp " ]
-  link_args = rewrapper_command + [ "--labels=type=link,tool=clang " ]
+  remote_wrapper =
+      rebase_path("//flutter/build/rbe/remote_wrapper_linux.sh", root_build_dir)
+  local_wrapper =
+      rebase_path("//flutter/build/rbe/local_wrapper.sh", root_build_dir)
+  compiler_args = rewrapper_command + [
+    "--remote_wrapper=$remote_wrapper",
+    "--local_wrapper=$local_wrapper",
+    "--labels=type=compile,compiler=clang,lang=cpp ",
+  ]
   compiler_prefix = string_join(" ", compiler_args)
-  link_prefix = string_join(" ", link_args)
+  link_prefix = ""
 } else if (use_ccache) {
   compiler_prefix = "ccache "
   link_prefix = "ccache "
