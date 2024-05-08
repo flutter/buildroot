@@ -371,6 +371,7 @@ if (is_win) {
 if (is_posix) {
   _native_compiler_configs += [
     "//build/config/gcc:no_exceptions",
+    "//build/config/gcc:relative_paths",
     "//build/config/gcc:symbol_visibility_hidden",
     "//build/config:symbol_visibility_hidden",
   ]
