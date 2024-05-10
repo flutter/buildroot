@@ -115,6 +115,7 @@ template("mac_toolchain") {
     }
 
     tool("asm") {
+      pool = "//build/toolchain:toolchain_pool($current_toolchain)"
       depfile = "{{output}}.d"
       command = "$asm -MMD -MF $depfile {{defines}} {{include_dirs}} {{asmflags}} {{cflags}} {{cflags_c}} $sysroot_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
@@ -124,6 +125,7 @@ template("mac_toolchain") {
     }
 
     tool("objc") {
+      pool = "//build/toolchain:toolchain_pool($current_toolchain)"
       depfile = "{{output}}.d"
       command = "$objc -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} {{cflags_objc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
@@ -133,6 +135,7 @@ template("mac_toolchain") {
     }
 
     tool("objcxx") {
+      pool = "//build/toolchain:toolchain_pool($current_toolchain)"
       depfile = "{{output}}.d"
       command = "$objc -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} {{cflags_objcc}} $sysroot_flags $coverage_flags -c {{source}} -o {{output}}"
       depsformat = "gcc"
@@ -142,6 +145,7 @@ template("mac_toolchain") {
     }
 
     tool("alink") {
+      pool = "//build/toolchain:toolchain_pool($current_toolchain)"
       command = "rm -f {{output}} && $ar rcs {{output}} {{inputs}}"
       description = "CREATE ARCHIVE {{output}}"
       outputs =
@@ -151,6 +155,7 @@ template("mac_toolchain") {
     }
 
     tool("solink") {
+      pool = "//build/toolchain:toolchain_pool($current_toolchain)"
       dylib = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"  # eg
                                                                              # "./libfoo.dylib"
       rspfile = dylib + ".rsp"
@@ -202,6 +207,7 @@ template("mac_toolchain") {
     }
 
     tool("link") {
+      pool = "//build/toolchain:toolchain_pool($current_toolchain)"
       outfile = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
       rspfile = "$outfile.rsp"
 
