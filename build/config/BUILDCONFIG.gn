@@ -354,8 +354,8 @@ _native_compiler_configs = [
 
 if (use_flutter_cxx) {
   _native_compiler_configs += [
-    "//third_party/libcxxabi:libcxxabi_config",
-    "//third_party/libcxx:libcxx_config",
+    "//flutter/third_party/libcxxabi:libcxxabi_config",
+    "//flutter/third_party/libcxx:libcxx_config",
   ]
 }
 
@@ -616,7 +616,7 @@ if (use_flutter_cxx) {
           deps = []
         }
         if (!defined(invoker.no_default_deps) || !invoker.no_default_deps) {
-          deps += [ "//third_party/libcxx" ]
+          deps += [ "//flutter/third_party/libcxx" ]
         }
       }
     }
