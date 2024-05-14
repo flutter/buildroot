@@ -3,10 +3,8 @@
 # found in the LICENSE file.
 
 import("//build/config/sysroot.gni")  # Imports android/config.gni.
-import("//build/toolchain/ccache.gni")
 import("//build/toolchain/clang.gni")
 import("//build/toolchain/gcc_toolchain.gni")
-import("//build/toolchain/goma.gni")
 import("//build/toolchain/rbe.gni")
 import("//build/toolchain/toolchain.gni")
 
@@ -37,13 +35,7 @@ template("android_toolchain") {
     solink_libs_section_prefix = "$android_ndk_lib/crtbegin_so.o"
     solink_libs_section_postfix = "$android_ndk_lib/crtend_so.o"
 
-    if (use_goma) {
-      assert(!use_rbe, "Goma and RBE can't be used together.")
-      assert(!use_ccache, "Goma and ccache can't be used together.")
-      assembler_prefix = "$goma_dir/gomacc "
-      compiler_prefix = "$goma_dir/gomacc "
-      link_prefix = "$goma_dir/gomacc "
-    } else if (use_rbe) {
+    if (use_rbe) {
       remote_wrapper = ""
       if (host_os == "linux") {
         remote_wrapper =
@@ -64,10 +56,6 @@ template("android_toolchain") {
       assembler_prefix = ""
       compiler_prefix = string_join(" ", compiler_args)
       link_prefix = ""
-    } else if (use_ccache) {
-      assembler_prefix = "ccache "
-      compiler_prefix = "ccache "
-      link_prefix = "ccache "
     } else {
       compiler_prefix = ""
       link_prefix = ""

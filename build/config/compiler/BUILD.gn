@@ -600,9 +600,9 @@ if (is_win) {
     "/wd4311",  # Pointer truncation from PVOID to DWORD.
     "/wd4477",  # Format string requires wchar_t*
   ]
-  import("//build/toolchain/goma.gni")
-  if (is_clang && use_goma) {
-    # goma compilation doesn't preserve file case, so don't warn about
+
+  if (is_clang && use_rbe) {
+    # rbe compilation doesn't preserve file case, so don't warn about
     # case-mismatches.
     default_warning_flags += [
       "-Wno-nonportable-include-path",
@@ -950,8 +950,7 @@ config("optimize_speed") {
 
 config("symbols") {
   if (is_win) {
-    import("//build/toolchain/goma.gni")
-    if (use_goma) {
+    if (use_rbe) {
       cflags = [ "/Z7" ]  # No PDB file
     } else {
       cflags = [ "/Zi" ]  # Produce PDB file, no edit and continue.

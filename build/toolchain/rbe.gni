@@ -16,8 +16,8 @@ declare_args() {
   # symlinks is a work around for that when using a local Xcode toolchain.
   # This property should not be set to true on LUCI.
   #
-  # If use_goma is false, this property is ignored.
-  # create_xcode_symlinks = false
+  # If use_rbe is false, this property is ignored.
+  create_xcode_symlinks = false
 
   rbe_exec_root = rebase_path("//")
 
