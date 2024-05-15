@@ -3,15 +3,10 @@
 # found in the LICENSE file.
 
 import("//build/toolchain/clang.gni")
-import("//build/toolchain/goma.gni")
 import("//build/toolchain/rbe.gni")
 import("//build/toolchain/toolchain.gni")
 
-if (use_goma) {
-  assert(!use_rbe, "Goma and RBE can't be used together.")
-  compiler_prefix = "$goma_dir/gomacc "
-  link_prefix = "$goma_dir/gomacc "
-} else if (use_rbe) {
+if (use_rbe) {
   compiler_args =
       rewrapper_command + [ "--labels=type=compile,compiler=clang,lang=cpp " ]
   compiler_prefix = string_join(" ", compiler_args)
