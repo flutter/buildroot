@@ -4,12 +4,17 @@
 
 import("//build/toolchain/clang.gni")
 import("//build/toolchain/rbe.gni")
+import("//build/toolchain/ccache.gni")
 import("//build/toolchain/toolchain.gni")
 
 if (use_rbe) {
   compiler_args =
       rewrapper_command + [ "--labels=type=compile,compiler=clang,lang=cpp " ]
   compiler_prefix = string_join(" ", compiler_args)
+  link_prefix = ""
+} else if (use_ccache) {
+  # ccache only supports compilation, not linking.
+  compiler_prefix = "ccache"
   link_prefix = ""
 } else {
   compiler_prefix = ""
