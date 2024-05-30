@@ -101,6 +101,7 @@ template("wasm_lib") {
     "deps",
     "includes",
     "inputs",
+    "libs",
     "sources",
     "include_dirs",
     "public_configs",

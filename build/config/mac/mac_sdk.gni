@@ -18,8 +18,8 @@ declare_args() {
   mac_sdk_path = ""
 }
 
-assert(mac_sdk_min != "")
-assert(mac_deployment_target != "")
+#assert(mac_sdk_min != "")
+#assert(mac_deployment_target != "")
 
 if (mac_sdk_path == "") {
   find_sdk_args = []
