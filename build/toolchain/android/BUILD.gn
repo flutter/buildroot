@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/config/sysroot.gni")  # Imports android/config.gni.
+import("//build/toolchain/ccache.gni")
 import("//build/toolchain/clang.gni")
 import("//build/toolchain/gcc_toolchain.gni")
 import("//build/toolchain/rbe.gni")
@@ -55,6 +56,11 @@ template("android_toolchain") {
       ]
       assembler_prefix = ""
       compiler_prefix = string_join(" ", compiler_args)
+      link_prefix = ""
+    } else if (use_ccache) {
+      # ccache only supports compilation, not linking.
+      assembler_prefix = "ccache "
+      compiler_prefix = ""
       link_prefix = ""
     } else {
       compiler_prefix = ""

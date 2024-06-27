@@ -10,6 +10,7 @@ import("//build/config/sysroot.gni")
 import("//build/toolchain/clang.gni")
 import("//build/toolchain/clang_static_analyzer.gni")
 import("//build/toolchain/rbe.gni")
+import("//build/toolchain/ccache.gni")
 import("//build/toolchain/toolchain.gni")
 
 if (host_cpu == "arm64") {
@@ -20,7 +21,12 @@ if (host_cpu == "arm64") {
       rebase_path("$buildtools_path/mac-x64/clang/bin", root_build_dir)
 }
 
-if (use_rbe) {
+if (use_ccache) {
+  # ccache only supports compilation, not linking.
+  cxx_prefix = "ccache "
+  objc_prefix = "ccache "
+  link_prefix = ""
+} else if (use_rbe) {
   remote_wrapper =
       rebase_path("//flutter/build/rbe/remote_wrapper.sh", root_build_dir)
   local_wrapper =
