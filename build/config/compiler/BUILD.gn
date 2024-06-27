@@ -296,6 +296,7 @@ config("compiler") {
       # Reduces global namespace pollution.
       "-s",
       "MODULARIZE=1",
+      "-sEXPORT_ES6",
 
       # Always produce a symbol map so that we can map crash traces
       "--emit-symbol-map",
