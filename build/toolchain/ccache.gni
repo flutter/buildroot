@@ -19,7 +19,12 @@
 # speed, you can do:
 # export CCACHE_CPP2=yes
 
+import("//build/toolchain/rbe.gni") # for use_rbe
+
 declare_args() {
   # Set to true to enable ccache.  Probably doesn't work on windows.
   use_ccache = false
 }
+
+assert(!is_win || !use_ccache, "ccache is not supported on Windows")
+assert(!use_ccache || !use_rbe, "ccache is not supported with RBE")
