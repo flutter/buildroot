@@ -4,6 +4,7 @@
 
 import errno
 import os
+import uuid
 
 """Creates a directory and its parents (i.e. `mkdir -p`).
 
@@ -21,10 +22,16 @@ def mkdir_p(path):
 """Creates or ovewrites a symlink from `link` to `target`."""
 def symlink(target, link):
   mkdir_p(os.path.dirname(link))
-  tmp_link = link + '.tmp'
+  tmp_link = link + '.tmp.' + uuid.uuid4().hex
   try:
     os.remove(tmp_link)
   except OSError:
     pass
   os.symlink(target, tmp_link)
-  os.rename(tmp_link, link)
+  try:
+    os.rename(tmp_link, link)
+  except FileExistsError:
+    try:
+      os.remove(tmp_link)
+    except OSError:
+      pass
