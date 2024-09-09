@@ -22,5 +22,7 @@ args = [path] + sys.argv[2:]
 try:
   subprocess.check_output(args, stderr=subprocess.STDOUT)
 except subprocess.CalledProcessError as ex:
+  print("Command failed: " + ' '.join(args))
+  print("exitCode: " + str(ex.returncode))
   print(ex.output.decode('utf-8', errors='replace'))
   sys.exit(ex.returncode)
