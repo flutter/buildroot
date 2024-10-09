@@ -36,4 +36,16 @@ except subprocess.CalledProcessError as ex:
   print("Command failed: " + ' '.join(args))
   print("exitCode: " + str(ex.returncode))
   print(ex.output.decode('utf-8', errors='replace'))
+
+
+  # For --time'd executions do another control run to confirm failures.
+  # This is to help troubleshoot https://github.com/flutter/flutter/issues/154437.
+  if sys.argv[1] == "--time":
+    try:
+      subprocess.check_output(args, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as ex:
+      print("2nd coming Command failed: " + ' '.join(args))
+      print("2nd coming exitCode: " + str(ex.returncode))
+      print(ex.output.decode('utf-8', errors='replace'))
+
   sys.exit(ex.returncode)
