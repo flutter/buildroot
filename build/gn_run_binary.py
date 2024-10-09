@@ -37,7 +37,6 @@ except subprocess.CalledProcessError as ex:
   print("exitCode: " + str(ex.returncode))
   print(ex.output.decode('utf-8', errors='replace'))
 
-
   # For --time'd executions do another control run to confirm failures.
   # This is to help troubleshoot https://github.com/flutter/flutter/issues/154437.
   if sys.argv[1] == "--time":
