@@ -136,12 +136,12 @@ template("compiled_action") {
     if (defined(invoker.prefix_with_time_cmd) && invoker.prefix_with_time_cmd) {
       if (host_os == "linux") {
         args += [
-          "time",
+          "/usr/bin/time",
           "-v",
         ]
       } else if (host_os == "mac") {
         args += [
-          "time",
+          "/usr/bin/time",
           "-l",
         ]
       } else {
