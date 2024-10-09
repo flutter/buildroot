@@ -13,13 +13,14 @@ import sys
 import subprocess
 
 
+args = []
 basearg = 1
 if sys.argv[1] == "--time":
   basearg = 2
   if (platform.system() == "Linux"):
-    args = ["/usr/bin/time", "-v"]
+    args += ["/usr/bin/time", "-v"]
   elif (platform.system() == "Darwin"):
-    args = ["/usr/bin/time", "-l"]
+    args += ["/usr/bin/time", "-l"]
 
 # This script is designed to run binaries produced by the current build. We
 # always prefix it with "./" to avoid picking up system versions that might
