@@ -93,11 +93,10 @@ def main(argv):
 
   for sdk in sdks:
     command =  [
-      'xcodebuild',
-      '-version',
-      '-sdk',
+      'xcrun',
+      '--sdk',
       sdk,
-      'Path'
+      '--show-sdk-path',
     ]
     sdk_output = run_command_with_retry(command, timeout=300)
     if symlink_path:

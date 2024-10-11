@@ -91,32 +91,14 @@ def main():
       '|sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer| '
       'if you are using Xcode 4.') % job.returncode)
 
-  sdk_command = ['xcodebuild',
-    '-showsdks',
-    '-json']
-  sdk_json_output = run_command_with_retry(sdk_command, timeout=300)
-  sdk_json = json.loads(sdk_json_output)
-
-  best_sdk = None
-  sdk_output = None
-
-  # Xcode can return the same version for different symlinked paths.
-  # Sort by path to keep the list stable between runs.
-  for properties in sorted(list(sdk_json), key=lambda d: d['sdkPath']):
-    # Filter out macOS DriverKit, watchOS, AppleTV, and other SDKs.
-    if properties.get('platform') != 'macosx' or 'driver' in properties.get('canonicalName'):
-      continue
-    sdk_version = properties['sdkVersion']
-    parsed_version = parse_version(sdk_version)
-    if (parsed_version >= parse_version(min_sdk_version) and
-          (not best_sdk or parsed_version < parse_version(best_sdk))):
-      best_sdk = sdk_version
-      sdk_output = properties['sdkPath']
-
-  if not best_sdk:
-    print(sdk_json_output)
-    raise Exception('No %s+ SDK found' % min_sdk_version)
-
+  # xcrun --sdk macosx  --show-sdk-path
+  sdk_command = [
+    'xcrun',
+    '--sdk',
+    'macosx',
+    '--show-sdk-path',
+  ]
+  sdk_output = run_command_with_retry(sdk_command, timeout=300)
   if symlink_path:
     sdks_path = os.path.join(symlink_path, 'SDKs')
     symlink_target = os.path.join(sdks_path, os.path.basename(sdk_output))
@@ -125,7 +107,6 @@ def main():
 
   if not options.as_gclient_hook:
     print(sdk_output)
-    print(best_sdk)
   return 0
 
 
