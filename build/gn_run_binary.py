@@ -8,27 +8,16 @@ Run with:
   python gn_run_binary.py <binary_name> [args ...]
 """
 
-import platform
 import sys
 import subprocess
-
-
-args = []
-basearg = 1
-if sys.argv[1] == "--time":
-  basearg = 2
-  if (platform.system() == "Linux"):
-    args += ["/usr/bin/time", "-v"]
-  elif (platform.system() == "Darwin"):
-    args += ["/usr/bin/time", "-l"]
 
 # This script is designed to run binaries produced by the current build. We
 # always prefix it with "./" to avoid picking up system versions that might
 # also be on the path.
-path = './' + sys.argv[basearg]
+path = './' + sys.argv[1]
 
 # The rest of the arguements are passed directly to the executable.
-args += [path] + sys.argv[basearg + 1:]
+args = [path] + sys.argv[2:]
 
 try:
   subprocess.check_output(args, stderr=subprocess.STDOUT)
