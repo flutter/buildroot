@@ -62,6 +62,11 @@ template("wasm_toolchain") {
       "{{root_out_dir}}/{{target_output_name}}.js.symbols",
     ]
 
+    if (wasm_use_pthreads || (defined(extra_toolchain_args.wasm_use_pthreads) &&
+                              extra_toolchain_args.wasm_use_pthreads)) {
+      link_outputs += [ "{{root_out_dir}}/{{target_output_name}}.worker.js" ]
+    }
+
     if (is_debug && !wasm_use_dwarf) {
       link_outputs += [ "{{root_out_dir}}/{{target_output_name}}.wasm.map" ]
     }
