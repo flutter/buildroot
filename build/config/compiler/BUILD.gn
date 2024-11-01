@@ -292,6 +292,8 @@ config("compiler") {
       "NO_EXIT_RUNTIME=1",
       "-s",
       "STRICT=1",
+      "-s",
+      "ENVIRONMENT=web,worker",
 
       # Reduces global namespace pollution.
       "-s",
