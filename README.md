@@ -1,5 +1,8 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/flutter/buildroot/badge)](https://api.securityscorecards.dev/projects/github.com/flutter/buildroot)
 
+> [!Important]
+> This repostiory is archived. The engine was migrated to [flutter/flutter/engine](https://github.com/flutter/flutter/tree/master/engine)
+
 # buildroot
 
 Build environment for the Flutter engine
